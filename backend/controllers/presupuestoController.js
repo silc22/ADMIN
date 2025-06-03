@@ -3,7 +3,21 @@ const Presupuesto = require('../models/Presupuesto');
 // Listar todos los presupuestos
 exports.obtenerPresupuestos = async (req, res) => {
   try {
-    const presupuestos = await Presupuesto.find().sort({ fechaCreacion: -1 });
+    const { q } = req.query;
+    let filtro = {};
+
+    if (q && q.trim() !== '') {
+      const regexp = new RegExp(q.trim(), 'i');
+      filtro = {
+        $or: [
+          { titulo: regexp },
+          { cliente: regexp },
+          { descripcion: regexp }
+        ]
+      };
+    }
+
+    const presupuestos = await Presupuesto.find(filtro).sort({ fechaCreacion: -1 });
     res.json(presupuestos);
   } catch (error) {
     console.error(error);

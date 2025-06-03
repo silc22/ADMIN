@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import BudgetForm from '../components/BudgetForm';
 import { crearPresupuesto } from '../api/presupuestoApi';
 import { useNavigate } from 'react-router-dom';

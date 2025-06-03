@@ -1,8 +1,9 @@
-// src/App.jsx
+// frontend/src/App.jsx
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import NewBudgetPage from './pages/NewBudgetPage';
+import EditBudgetPage from './pages/EditBudgetPage'; 
 
 function App() {
   return (
@@ -14,11 +15,13 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/nuevo-presupuesto" element={<NewBudgetPage />} />
-        {/* Podrías añadir rutas para editar, ver detalle, etc. */}
+        <Route path="/editar-presupuesto/:id" element={<EditBudgetPage />} /> 
+        {/* Agregar nueva ruta */}
       </Routes>
     </Router>
   );
 }
 
 export default App;
+
 
