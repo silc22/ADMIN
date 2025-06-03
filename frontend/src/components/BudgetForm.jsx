@@ -8,6 +8,7 @@ function BudgetForm({ onSubmit, isSubmitting, initialData = null }) {
   const [descripcion, setDescripcion] = useState('');
   const [monto, setMonto] = useState('');
   const [estado, setEstado] = useState('pendiente');
+  const [file, setFile] = useState(null);
 
   // Este useEffect solo corre si initialData es un objeto con datos
   useEffect(() => {
@@ -17,6 +18,9 @@ function BudgetForm({ onSubmit, isSubmitting, initialData = null }) {
       setDescripcion(initialData.descripcion || '');
       setMonto(initialData.monto !== undefined ? initialData.monto : '');
       setEstado(initialData.estado || 'pendiente');
+       // Si existe un adjunto en initialData.archivo.url, no lo cargamos como File,
+      // pero podremos mostrar un enlace al archivo ya existente en la UI (ver más abajo).
+      setFile(null);
     }
     // Solo se dispara cuando initialData cambia (p. ej. al cargar los datos desde el backend)
   }, [initialData]);
@@ -28,7 +32,8 @@ function BudgetForm({ onSubmit, isSubmitting, initialData = null }) {
       return;
     }
     const data = { titulo, cliente, descripcion, monto: Number(monto), estado };
-    onSubmit(data);
+    // Pasamos data y el objeto file (puede ser null)
+    onSubmit(data, file);
   };
 
   return (
@@ -89,6 +94,27 @@ function BudgetForm({ onSubmit, isSubmitting, initialData = null }) {
           <option value="aprobado">Aprobado</option>
           <option value="rechazado">Rechazado</option>
         </select>
+      </div>
+
+      <div>
+        <label>Archivo adjunto (opcional):</label><br />
+        <input
+          type="file"
+          accept=".pdf,image/*"
+          onChange={e => setFile(e.target.files[0] || null)}
+        />
+        {initialData && initialData.archivo && initialData.archivo.url && (
+          <p>
+            Archivo actual:{' '}
+            <a
+              href={`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}${initialData.archivo.url}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {initialData.archivo.originalName || 'Descargar'}
+            </a>
+          </p>
+        )}
       </div>
 
       <button

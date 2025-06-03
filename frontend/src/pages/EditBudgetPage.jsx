@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import BudgetForm from '../components/BudgetForm';
-import { actualizarPresupuesto } from '../api/presupuestoApi';
-import axios from 'axios';
+import { getPresupuestoPorId, actualizarPresupuesto } from '../api/presupuestoApi';
+/*import axios from 'axios';*/
 
 function EditBudgetPage() {
   const { id } = useParams();           // Obtenemos el ID de la URL
@@ -13,20 +13,13 @@ function EditBudgetPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   
-   useEffect(() => {
-    // Definimos la función **dentro** de useEffect
-    const fetchPresupuestoPorId = async () => {
+    useEffect(() => {
+    const fetchPresupuesto = async () => {
       try {
         setError(null);
         setCargando(true);
-        const respuesta = await axios.get(`http://localhost:5000/api/presupuestos/${id}`);
-        setInitialData({
-          titulo: respuesta.data.titulo,
-          cliente: respuesta.data.cliente,
-          descripcion: respuesta.data.descripcion,
-          monto: respuesta.data.monto,
-          estado: respuesta.data.estado
-        });
+        const respuesta = await getPresupuestoPorId(id);
+        setInitialData(respuesta.data);
       } catch (err) {
         console.error(err);
         setError('Error al cargar el presupuesto');
@@ -34,16 +27,14 @@ function EditBudgetPage() {
         setCargando(false);
       }
     };
-
-    fetchPresupuestoPorId();
-  }, [id]); // Ahora solo depende de 'id'
+    fetchPresupuesto();
+  }, [id]);
 
   // Función que se pasará a BudgetForm para manejar el submit
-  const handleActualizar = async (datos) => {
+  const handleActualizar = async (datos, file) => {
     try {
       setIsSubmitting(true);
-      await actualizarPresupuesto(id, datos);
-      // Al terminar, redirigimos a la lista
+      await actualizarPresupuesto(id, datos, file);
       navigate('/');
     } catch (err) {
       console.error(err);

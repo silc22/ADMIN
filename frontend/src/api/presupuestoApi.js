@@ -9,18 +9,45 @@ export const getPresupuestos = (query = '') => {
   return axios.get(url);
 };
 
-export const crearPresupuesto = (data) => {
-  return axios.post(`${API_URL}/presupuestos`, data);
+export const getPresupuestoPorId = (id) => {
+  return axios.get(`${API_URL}/presupuestos/${id}`);
 };
 
-// --------------------------------------------------
-// Nueva función: eliminar un presupuesto por ID
+export const crearPresupuesto = (data, file) => {
+  // Construir FormData
+  const formData = new FormData();
+  formData.append('titulo', data.titulo);
+  formData.append('cliente', data.cliente);
+  formData.append('descripcion', data.descripcion);
+  formData.append('monto', data.monto);
+  formData.append('estado', data.estado);
+  if (file) {
+    formData.append('archivo', file); // “archivo” coincide con upload.single('archivo')
+  }
+  return axios.post(`${API_URL}/presupuestos`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  });
+};
+
+
+// actualizar un presupuesto
+export const actualizarPresupuesto = (id, data, file) => {
+  const formData = new FormData();
+  formData.append('titulo', data.titulo);
+  formData.append('cliente', data.cliente);
+  formData.append('descripcion', data.descripcion);
+  formData.append('monto', data.monto);
+  formData.append('estado', data.estado);
+  if (file) {
+    formData.append('archivo', file);
+  }
+  return axios.put(`${API_URL}/presupuestos/${id}`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  });
+};
+
+
+//  eliminar un presupuesto por ID
 export const eliminarPresupuesto = (id) => {
   return axios.delete(`${API_URL}/presupuestos/${id}`);
 };
-
-// Nueva función: actualizar un presupuesto por ID
-export const actualizarPresupuesto = (id, data) => {
-  return axios.put(`${API_URL}/presupuestos/${id}`, data);
-};
-

@@ -7,11 +7,10 @@ function NewBudgetPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
-  const handleCrear = async (datos) => {
+  const handleCrear = async (datos, file) => {
     setIsSubmitting(true);
     try {
-      await crearPresupuesto(datos);
-      // Una vez creado, redirige a la lista ("/")
+      await crearPresupuesto(datos, file);
       navigate('/');
     } catch (error) {
       console.error(error);
