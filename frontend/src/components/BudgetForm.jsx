@@ -9,6 +9,7 @@ function BudgetForm({ onSubmit, isSubmitting, initialData = null }) {
   const [monto, setMonto] = useState('');
   const [estado, setEstado] = useState('pendiente');
   const [file, setFile] = useState(null);
+  const [removeFile, setRemoveFile] = useState(false);
 
   // Este useEffect solo corre si initialData es un objeto con datos
   useEffect(() => {
@@ -18,9 +19,8 @@ function BudgetForm({ onSubmit, isSubmitting, initialData = null }) {
       setDescripcion(initialData.descripcion || '');
       setMonto(initialData.monto !== undefined ? initialData.monto : '');
       setEstado(initialData.estado || 'pendiente');
-       // Si existe un adjunto en initialData.archivo.url, no lo cargamos como File,
-      // pero podremos mostrar un enlace al archivo ya existente en la UI (ver más abajo).
       setFile(null);
+      setRemoveFile(false);
     }
     // Solo se dispara cuando initialData cambia (p. ej. al cargar los datos desde el backend)
   }, [initialData]);
@@ -31,12 +31,12 @@ function BudgetForm({ onSubmit, isSubmitting, initialData = null }) {
       alert('El título, el cliente y el monto (>=0) son obligatorios');
       return;
     }
-    const data = { titulo, cliente, descripcion, monto: Number(monto), estado };
+    const data = { titulo, cliente, descripcion, monto: Number(monto), estado, removeFile };
     // Pasamos data y el objeto file (puede ser null)
     onSubmit(data, file);
   };
 
-  return (
+   return (
     <form onSubmit={manejarSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
       <div>
         <label>Título:</label><br />
@@ -96,24 +96,46 @@ function BudgetForm({ onSubmit, isSubmitting, initialData = null }) {
         </select>
       </div>
 
+      {/* Input de archivo */}
       <div>
         <label>Archivo adjunto (opcional):</label><br />
         <input
           type="file"
           accept=".pdf,image/*"
-          onChange={e => setFile(e.target.files[0] || null)}
+          onChange={e => {
+            setFile(e.target.files[0] || null);
+            // Si selecciona un archivo nuevo, anulamos el removeFile
+            if (e.target.files[0]) setRemoveFile(false);
+          }}
+          disabled={removeFile} // si marca “Eliminar”, deshabilita subir nuevo
         />
+        {/* Enlace al archivo actual */}
         {initialData && initialData.archivo && initialData.archivo.url && (
-          <p>
-            Archivo actual:{' '}
-            <a
-              href={`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}${initialData.archivo.url}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {initialData.archivo.originalName || 'Descargar'}
-            </a>
-          </p>
+          <>
+            <p>
+              Archivo actual:{' '}
+              <a
+                href={`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}${initialData.archivo.url}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {initialData.archivo.originalName || 'Descargar'}
+              </a>
+            </p>
+            {/* Checkbox para eliminar */}
+            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <input
+                type="checkbox"
+                checked={removeFile}
+                onChange={e => {
+                  setRemoveFile(e.target.checked);
+                  // Si decide eliminar, limpiar cualquier file seleccionado
+                  if (e.target.checked) setFile(null);
+                }}
+              />
+              Eliminar archivo actual
+            </label>
+          </>
         )}
       </div>
 

@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import BudgetForm from '../components/BudgetForm';
 import { getPresupuestoPorId, actualizarPresupuesto } from '../api/presupuestoApi';
-/*import axios from 'axios';*/
 
 function EditBudgetPage() {
   const { id } = useParams();           // Obtenemos el ID de la URL

@@ -30,7 +30,8 @@ export const crearPresupuesto = (data, file) => {
 };
 
 
-// actualizar un presupuesto
+//Actualizar un presupuesto
+// Ahora recibe data, file; data.removeFile indica si debe borrar el adjunto
 export const actualizarPresupuesto = (id, data, file) => {
   const formData = new FormData();
   formData.append('titulo', data.titulo);
@@ -41,6 +42,9 @@ export const actualizarPresupuesto = (id, data, file) => {
   if (file) {
     formData.append('archivo', file);
   }
+  // Siempre enviar el flag removeFile (true/false)
+  formData.append('removeFile', data.removeFile ? 'true' : 'false');
+
   return axios.put(`${API_URL}/presupuestos/${id}`, formData, {
     headers: { 'Content-Type': 'multipart/form-data' }
   });
