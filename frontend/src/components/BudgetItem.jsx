@@ -26,6 +26,9 @@ function BudgetItem({ presupuesto, onEliminar }) {
     navigate(`/editar-presupuesto/${_id}`);
   };
 
+  // Construir base de la URL (o usar env var)
+  const baseURL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+
   return (
     <div style={{
       border: '1px solid #ccc',
@@ -41,18 +44,29 @@ function BudgetItem({ presupuesto, onEliminar }) {
       <p><strong>Estado:</strong> {estado}</p>
       <p><small>Creado el: {fecha}</small></p>
 
-      {/* Si existe un archivo adjunto, mostrar enlace */}
       {archivo && archivo.url && (
-        <p>
-          <strong>Adjunto:</strong>{' '}
-          <a
-            href={`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}${archivo.url}`}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {archivo.originalName || 'Descargar archivo'}
-          </a>
-        </p>
+        <div style={{ marginTop: '0.5rem' }}>
+          {archivo.mimeType.startsWith('image/') ? (
+            // Miniatura
+            <img
+              src={`${baseURL}${archivo.url}`}
+              alt={archivo.originalName}
+              style={{ maxWidth: '150px', maxHeight: '100px', display: 'block', marginBottom: '0.5rem' }}
+            />
+          ) : null}
+
+          {/* Enlace de descarga */}
+          <p>
+            <strong>Adjunto:</strong>{' '}
+            <a
+              href={`${baseURL}${archivo.url}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {archivo.originalName || 'Descargar archivo'}
+            </a>
+          </p>
+        </div>
       )}
 
       <div style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem' }}>
@@ -69,7 +83,6 @@ function BudgetItem({ presupuesto, onEliminar }) {
         >
           Editar
         </button>
-
         <button
           onClick={handleEliminar}
           style={{

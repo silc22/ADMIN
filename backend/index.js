@@ -3,8 +3,17 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
+const multer = require('multer');
+const fs = require('fs');
 
 const app = express();
+
+// 1) Definir y crear, si no existe, la carpeta “uploads”
+const uploadsDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir);
+}
+
 
 // Conexión a MongoDB
 const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/presupuestos_db';
@@ -18,51 +27,64 @@ mongoose.connect(mongoURI, {
 // Middlewares
 app.use(cors());
 app.use(express.json()); // Para parsear JSON en el body de las peticiones
+app.use((err, req, res, next) => {
+  if (err.code === 'LIMIT_FILE_SIZE') {
+    return res.status(400).json({ mensaje: 'El archivo supera el tamaño máximo (5 MB).' });
+  }
+  if (err.message === 'Tipo de archivo no soportado') {
+    return res.status(400).json({ mensaje: err.message });
+  }
+  // Otros errores:
+  res.status(500).json({ mensaje: err.message || 'Error interno del servidor.' });
+});
+
 
 // 3) Configurar carpeta “uploads” para servir archivos estáticos
 //    (si la guardas en backend/uploads)
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads', express.static(uploadsDir, {
+  extensions: false,
+  index: false,
+  dotfiles: 'ignore', 
+  setHeaders: (res, path) => {
+    // Por ejemplo, evitar que se interprete como HTML
+    res.set('X-Content-Type-Options', 'nosniff');
+  }
+}));
 
-// 4) Configurar Multer para manejar multipart/form-data
-const multer = require('multer');
 
 // Opciones de almacenamiento en disco
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    // Carpeta donde se guardan los archivos; crea “backend/uploads” si no existe
-    cb(null, path.join(__dirname, 'uploads'));
+    cb(null, uploadsDir);
   },
   filename: (req, file, cb) => {
-    // Generar un nombre único: timestamp + nombre original
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    const ext = path.extname(file.originalname); // p. ej. ".pdf"
+    const ext = path.extname(file.originalname); 
     cb(null, file.fieldname + '-' + uniqueSuffix + ext);
   }
 });
 
-// Filtro de tipos de archivo (opcional: solo PDF, imágenes, etc.)
+// EJEMPLO: solo permitir PDF
 const fileFilter = (req, file, cb) => {
-  // Por ejemplo, solo permitir PDF o imágenes
-  const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png'];
-  if (allowedTypes.includes(file.mimetype)) {
+  const allowed = ['application/pdf', 'image/jpeg', 'image/png'];
+  if (allowed.includes(file.mimetype)) {
     cb(null, true);
   } else {
     cb(new Error('Tipo de archivo no soportado'), false);
   }
 };
 
-// Límite de tamaño (p. ej. 5 MB)
 const upload = multer({
   storage,
   fileFilter,
-  limits: { fileSize: 5 * 1024 * 1024 }
+  limits: { fileSize: 5 * 1024 * 1024 } // 5 MB máximo
 });
 
-// 5) Rutas
+// 4) Rutas
 //    Pasaremos `upload.single('archivo')` en aquellas rutas que admitan adjuntar archivo
 app.use('/api/presupuestos', require('./routes/presupuestoRoutes')(upload));
 
-// 6) Ruta de prueba
+// 5) Ruta de prueba
 app.get('/', (req, res) => {
   res.send('API de Presupuestos con adjuntos funcionando');
 });
@@ -72,3 +94,4 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Servidor escuchando en puerto ${PORT}`);
 });
+

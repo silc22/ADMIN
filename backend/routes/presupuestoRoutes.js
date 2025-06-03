@@ -20,7 +20,12 @@ module.exports = (upload) => {
   router.get('/:id', obtenerPresupuestoPorId);
 
   // POST /api/presupuestos       ⇒ Crear nuevo (admite archivo único en “archivo”)
-  router.post('/', upload.single('archivo'), crearPresupuesto);
+  router.post('/', upload.single('archivo'), (req, res, next) => {
+  // Si Multer detectó un archivo muy grande, llega aquí un error con code === 'LIMIT_FILE_SIZE'
+  // El manejador de errores general de Express debería capturarlo. Si quieres personalizar:
+  // next(new Error('El archivo es demasiado grande. Tamaño máximo 5 MB.'));
+  crearPresupuesto(req, res); // tu función normalmente
+});
 
   // PUT /api/presupuestos/:id    ⇒ Actualizar (admite reemplazar/añadir archivo)
   router.put('/:id', upload.single('archivo'), actualizarPresupuesto);

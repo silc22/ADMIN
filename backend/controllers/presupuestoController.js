@@ -1,4 +1,6 @@
 const Presupuesto = require('../models/Presupuesto');
+const fs = require('fs');
+const path = require('path');
 
 // Listar todos los presupuestos
 exports.obtenerPresupuestos = async (req, res) => {
@@ -81,24 +83,23 @@ exports.actualizarPresupuesto = async (req, res) => {
   try {
     const { id } = req.params;
     const { titulo, cliente, descripcion, monto, estado } = req.body;
-    // Buscar el presupuesto existente
-    const presupuestoExistente = await Presupuesto.findById(id);
-    if (!presupuestoExistente) {
+
+    const presupuesto = await Presupuesto.findById(id);
+    if (!presupuesto) {
       return res.status(404).json({ mensaje: 'Presupuesto no encontrado' });
     }
 
-    // Actualizar campos
-    presupuestoExistente.titulo = titulo;
-    presupuestoExistente.cliente = cliente;
-    presupuestoExistente.descripcion = descripcion;
-    presupuestoExistente.monto = monto;
-    presupuestoExistente.estado = estado;
-
-    // Si hay un nuevo archivo, reemplazar o añadir
+    // Si llega req.file, significa que quieren reemplazar el adjunto
     if (req.file) {
-      // (Opcional: podrías borrar el archivo viejo del disco aquí)
-
-      presupuestoExistente.archivo = {
+      // Borrar el archivo anterior si existía
+      if (presupuesto.archivo && presupuesto.archivo.filename) {
+        const oldPath = path.join(__dirname, '..', 'uploads', presupuesto.archivo.filename);
+        if (fs.existsSync(oldPath)) {
+          fs.unlinkSync(oldPath);
+        }
+      }
+      // Asignar los datos del nuevo archivo
+      presupuesto.archivo = {
         originalName: req.file.originalname,
         filename: req.file.filename,
         mimeType: req.file.mimetype,
@@ -107,8 +108,15 @@ exports.actualizarPresupuesto = async (req, res) => {
       };
     }
 
-    const presupuestoActualizado = await presupuestoExistente.save();
-    res.json(presupuestoActualizado);
+    // Actualizar los demás campos
+    presupuesto.titulo = titulo;
+    presupuesto.cliente = cliente;
+    presupuesto.descripcion = descripcion;
+    presupuesto.monto = monto;
+    presupuesto.estado = estado;
+
+    const actualizado = await presupuesto.save();
+    res.json(actualizado);
   } catch (error) {
     console.error(error);
     res.status(500).json({ mensaje: 'Error al actualizar presupuesto' });
@@ -119,10 +127,23 @@ exports.actualizarPresupuesto = async (req, res) => {
 exports.eliminarPresupuesto = async (req, res) => {
   try {
     const { id } = req.params;
-    const eliminado = await Presupuesto.findByIdAndDelete(id);
-    if (!eliminado) {
+    // Primero, buscar para saber si existía archivo
+    const presupuesto = await Presupuesto.findById(id);
+    if (!presupuesto) {
       return res.status(404).json({ mensaje: 'Presupuesto no encontrado' });
     }
+
+    // Si tenía un archivo adjunto, borrarlo del disco
+    if (presupuesto.archivo && presupuesto.archivo.filename) {
+      const filePath = path.join(__dirname, '..', 'uploads', presupuesto.archivo.filename);
+      // Verificar que realmente exista
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+    }
+
+    // Ahora sí borramos el documento
+    await Presupuesto.findByIdAndDelete(id);
     res.json({ mensaje: 'Presupuesto eliminado correctamente' });
   } catch (error) {
     console.error(error);

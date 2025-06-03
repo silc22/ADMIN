@@ -54,7 +54,7 @@ function BudgetList() {
       <form onSubmit={handleBuscar} style={{ marginBottom: '1rem' }}>
         <input
           type="text"
-          placeholder="Buscar presupuesto por título, cliente o descripción…"
+          placeholder="Buscar presupuesto por título, cliente, descripción o estado…"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           style={{
