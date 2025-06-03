@@ -1,27 +1,32 @@
-// routes/presupuestoRoutes.js
+// backend/routes/presupuestoRoutes.js
 const express = require('express');
 const router = express.Router();
-const {
-  obtenerPresupuestos,
-  obtenerPresupuestoPorId,
-  crearPresupuesto,
-  actualizarPresupuesto,
-  eliminarPresupuesto
-} = require('../controllers/presupuestoController');
+const path = require('path');
 
-// GET /api/presupuestos        ⇒ Listar todos
-router.get('/', obtenerPresupuestos);
+module.exports = (upload) => {
+  // Importamos las funciones del controlador
+  const {
+    obtenerPresupuestos,
+    obtenerPresupuestoPorId,
+    crearPresupuesto,
+    actualizarPresupuesto,
+    eliminarPresupuesto
+  } = require('../controllers/presupuestoController');
 
-// GET /api/presupuestos/:id    ⇒ Obtener uno
-router.get('/:id', obtenerPresupuestoPorId);
+  // GET /api/presupuestos        ⇒ Listar todos (sin adjunto)
+  router.get('/', obtenerPresupuestos);
 
-// POST /api/presupuestos       ⇒ Crear nuevo
-router.post('/', crearPresupuesto);
+  // GET /api/presupuestos/:id    ⇒ Obtener uno (incluyendo info de archivo)
+  router.get('/:id', obtenerPresupuestoPorId);
 
-// PUT /api/presupuestos/:id    ⇒ Actualizar
-router.put('/:id', actualizarPresupuesto);
+  // POST /api/presupuestos       ⇒ Crear nuevo (admite archivo único en “archivo”)
+  router.post('/', upload.single('archivo'), crearPresupuesto);
 
-// DELETE /api/presupuestos/:id ⇒ Eliminar
-router.delete('/:id', eliminarPresupuesto);
+  // PUT /api/presupuestos/:id    ⇒ Actualizar (admite reemplazar/añadir archivo)
+  router.put('/:id', upload.single('archivo'), actualizarPresupuesto);
 
-module.exports = router;
+  // DELETE /api/presupuestos/:id ⇒ Eliminar
+  router.delete('/:id', eliminarPresupuesto);
+
+  return router;
+};

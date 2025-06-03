@@ -12,7 +12,8 @@ exports.obtenerPresupuestos = async (req, res) => {
         $or: [
           { titulo: regexp },
           { cliente: regexp },
-          { descripcion: regexp }
+          { descripcion: regexp },
+          { estado: regexp }
         ]
       };
     }
@@ -43,8 +44,30 @@ exports.obtenerPresupuestoPorId = async (req, res) => {
 // Crear un nuevo presupuesto
 exports.crearPresupuesto = async (req, res) => {
   try {
+    // Campos del body (titúlo, cliente, descripción, monto, estado)
     const { titulo, cliente, descripcion, monto, estado } = req.body;
-    const nuevoPresupuesto = new Presupuesto({ titulo, cliente, descripcion, monto, estado });
+
+    // Construir nuevo objeto Presupuesto
+    const nuevoPresupuesto = new Presupuesto({
+      titulo,
+      cliente,
+      descripcion,
+      monto,
+      estado
+    });
+
+    // Si llega archivo en req.file, lo guardamos en el campo “archivo”
+    if (req.file) {
+      nuevoPresupuesto.archivo = {
+        originalName: req.file.originalname,
+        filename: req.file.filename,
+        mimeType: req.file.mimetype,
+        size: req.file.size,
+        // La URL pública para servirlo será: /uploads/<filename>
+        url: `/uploads/${req.file.filename}`
+      };
+    }
+
     const presupuestoGuardado = await nuevoPresupuesto.save();
     res.status(201).json(presupuestoGuardado);
   } catch (error) {
@@ -58,14 +81,33 @@ exports.actualizarPresupuesto = async (req, res) => {
   try {
     const { id } = req.params;
     const { titulo, cliente, descripcion, monto, estado } = req.body;
-    const presupuestoActualizado = await Presupuesto.findByIdAndUpdate(
-      id,
-      { titulo, cliente, descripcion, monto, estado },
-      { new: true, runValidators: true }
-    );
-    if (!presupuestoActualizado) {
+    // Buscar el presupuesto existente
+    const presupuestoExistente = await Presupuesto.findById(id);
+    if (!presupuestoExistente) {
       return res.status(404).json({ mensaje: 'Presupuesto no encontrado' });
     }
+
+    // Actualizar campos
+    presupuestoExistente.titulo = titulo;
+    presupuestoExistente.cliente = cliente;
+    presupuestoExistente.descripcion = descripcion;
+    presupuestoExistente.monto = monto;
+    presupuestoExistente.estado = estado;
+
+    // Si hay un nuevo archivo, reemplazar o añadir
+    if (req.file) {
+      // (Opcional: podrías borrar el archivo viejo del disco aquí)
+
+      presupuestoExistente.archivo = {
+        originalName: req.file.originalname,
+        filename: req.file.filename,
+        mimeType: req.file.mimetype,
+        size: req.file.size,
+        url: `/uploads/${req.file.filename}`
+      };
+    }
+
+    const presupuestoActualizado = await presupuestoExistente.save();
     res.json(presupuestoActualizado);
   } catch (error) {
     console.error(error);
