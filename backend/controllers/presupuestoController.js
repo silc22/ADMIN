@@ -1,4 +1,5 @@
 const Presupuesto = require('../models/Presupuesto');
+const Counter = require('../models/Counter');
 const fs = require('fs');
 const path = require('path');
 
@@ -51,7 +52,7 @@ exports.crearPresupuesto = async (req, res) => {
 
     // Construir nuevo objeto Presupuesto
     const nuevoPresupuesto = new Presupuesto({
-      titulo,
+      titulo: titulo || '',
       cliente,
       descripcion,
       monto,
@@ -120,8 +121,7 @@ exports.actualizarPresupuesto = async (req, res) => {
       };
     }
 
-    // Actualizar campos de texto/números (monto convertir a Number)
-    presupuesto.titulo = titulo;
+     if (typeof titulo !== 'undefined') presupuesto.titulo = titulo;
     presupuesto.cliente = cliente;
     presupuesto.descripcion = descripcion;
     presupuesto.monto = Number(monto);
@@ -137,25 +137,50 @@ exports.actualizarPresupuesto = async (req, res) => {
 
 // Eliminar un presupuesto
 exports.eliminarPresupuesto = async (req, res) => {
-  try {
+   try {
     const { id } = req.params;
-    // Primero, buscar para saber si existía archivo
+    // 1) Buscamos el presupuesto para extraer su identifier
     const presupuesto = await Presupuesto.findById(id);
     if (!presupuesto) {
       return res.status(404).json({ mensaje: 'Presupuesto no encontrado' });
     }
 
-    // Si tenía un archivo adjunto, borrarlo del disco
+    const deletedIdentifier = presupuesto.identifier;
+
+    // 2) Si tenía un archivo adjunto, lo borramos del disco
     if (presupuesto.archivo && presupuesto.archivo.filename) {
       const filePath = path.join(__dirname, '..', 'uploads', presupuesto.archivo.filename);
-      // Verificar que realmente exista
       if (fs.existsSync(filePath)) {
         fs.unlinkSync(filePath);
       }
     }
 
-    // Ahora sí borramos el documento
+    // 3) Eliminamos el documento
     await Presupuesto.findByIdAndDelete(id);
+
+    // 4) Comprobamos cuántos presupuestos quedan
+    const remainingCount = await Presupuesto.countDocuments();
+
+    // 5) Obtenemos el documento del contador
+    const counterDoc = await Counter.findById('presupuestoId');
+    if (!counterDoc) {
+      // Si el contador no existe, crearlo en 0 (no debería pasar, pero por si acaso)
+      await Counter.create({ _id: 'presupuestoId', seq: 0 });
+    } else {
+      if (remainingCount === 0) {
+        // Si ya no quedan presupuestos, reiniciar seq a 0
+        counterDoc.seq = 0;
+        await counterDoc.save();
+      } else {
+        // Si todavía hay presupuestos, solo decrementamos si borramos el último
+        // (es decir, deletedIdentifier === counter.seq)
+        if (deletedIdentifier === counterDoc.seq) {
+          counterDoc.seq = counterDoc.seq - 1;
+          await counterDoc.save();
+        }
+      }
+    }
+
     res.json({ mensaje: 'Presupuesto eliminado correctamente' });
   } catch (error) {
     console.error(error);

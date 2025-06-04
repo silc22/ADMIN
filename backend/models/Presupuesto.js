@@ -1,10 +1,14 @@
-// backend/models/Presupuesto.js
 const mongoose = require('mongoose');
+const Counter = require('./Counter');
 
 const PresupuestoSchema = new mongoose.Schema({
+  identifier: {
+    type: Number,
+    unique: true
+  },
   titulo: {
     type: String,
-    required: true,
+    default: '',
     trim: true
   },
   cliente: {
@@ -35,6 +39,27 @@ const PresupuestoSchema = new mongoose.Schema({
     mimeType: { type: String },      // tipo MIME (p. ej. "application/pdf")
     size: { type: Number },          // tamaño en bytes
     url: { type: String }            // ruta pública para descargar
+  }
+});
+
+// Hook pre-save: si es nuevo, incrementamos el contador y asignamos identifier = seq
+PresupuestoSchema.pre('save', async function(next) {
+  if (this.isNew) {
+    try {
+      // Buscar o crear el contador "presupuestoId" y aumentarlo en 1
+      const counter = await Counter.findByIdAndUpdate(
+        { _id: 'presupuestoId' },
+        { $inc: { seq: 1 } },
+        { new: true, upsert: true }
+      );
+      // Asignar identifier como número (1, 2, 3, …)
+      this.identifier = counter.seq;
+      next();
+    } catch (err) {
+      next(err);
+    }
+  } else {
+    next();
   }
 });
 

@@ -1,5 +1,5 @@
 // src/components/BudgetForm.jsx
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 function BudgetForm({ onSubmit, isSubmitting, initialData = null }) {
   // Inicialmente, si no hay initialData definimos todos los estados vacíos
@@ -27,7 +27,7 @@ function BudgetForm({ onSubmit, isSubmitting, initialData = null }) {
 
   const manejarSubmit = (e) => {
     e.preventDefault();
-    if (!titulo.trim() || !cliente.trim() || monto === '' || monto < 0) {
+    if (!cliente.trim() || monto === '' || monto < 0 ) {
       alert('El título, el cliente y el monto (>=0) son obligatorios');
       return;
     }
@@ -38,14 +38,14 @@ function BudgetForm({ onSubmit, isSubmitting, initialData = null }) {
 
    return (
     <form onSubmit={manejarSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-      <div>
-        <label>Título:</label><br />
+     <div>
+        <label className="block font-medium mb-1">Título (opcional):</label>
         <input
           type="text"
           value={titulo}
           onChange={e => setTitulo(e.target.value)}
-          required
-          style={{ width: '100%', padding: '0.5rem' }}
+          className="w-full border px-3 py-2 rounded"
+          placeholder="Si lo dejas vacío, aparecerá solo el número"
         />
       </div>
 
@@ -96,7 +96,6 @@ function BudgetForm({ onSubmit, isSubmitting, initialData = null }) {
         </select>
       </div>
 
-      {/* Input de archivo */}
       <div>
         <label>Archivo adjunto (opcional):</label><br />
         <input

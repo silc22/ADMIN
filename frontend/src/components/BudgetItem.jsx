@@ -1,11 +1,9 @@
-// frontend/src/components/BudgetItem.jsx
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { eliminarPresupuesto } from '../api/presupuestoApi';
 
 function BudgetItem({ presupuesto, onEliminar }) {
   const navigate = useNavigate();
-  const { _id, titulo, cliente, descripcion, monto, estado, fechaCreacion, archivo } = presupuesto;
+  const { _id, identifier, titulo, cliente, descripcion, monto, estado, fechaCreacion, archivo } = presupuesto;
   const fecha = new Date(fechaCreacion).toLocaleDateString('es-ES');
 
   // Función que se ejecuta al pulsar "Eliminar"
@@ -37,7 +35,9 @@ function BudgetItem({ presupuesto, onEliminar }) {
       marginBottom: '1rem',
       boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
     }}>
-      <h3>{titulo}</h3>
+      <h3 className="text-xl font-semibold">
+        {identifier} {titulo ? `- ${titulo}` : ''}
+      </h3>
       <p><strong>Cliente:</strong> {cliente}</p>
       <p>{descripcion}</p>
       <p><strong>Monto:</strong> € {monto.toFixed(2)}</p>
