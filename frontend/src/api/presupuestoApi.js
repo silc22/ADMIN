@@ -1,6 +1,4 @@
-import axios from 'axios';
-
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+import apiClient from './axiosConfig';
 
 export const getPresupuestos = ({ q = '', page = 1, limit = 10 } = {}) => {
   const params = {};
@@ -9,11 +7,11 @@ export const getPresupuestos = ({ q = '', page = 1, limit = 10 } = {}) => {
   }
   params.page = page;
   params.limit = limit;
-  return axios.get(`${API_URL}/presupuestos`, { params });
+   return apiClient.get('/presupuestos', { params });
 };
 
 export const getPresupuestoPorId = (id) => {
-  return axios.get(`${API_URL}/presupuestos/${id}`);
+  return apiClient.get(`/presupuestos/${id}`);
 };
 
 export const crearPresupuesto = (data, file) => {
@@ -27,7 +25,7 @@ export const crearPresupuesto = (data, file) => {
   if (file) {
     formData.append('archivo', file); // “archivo” coincide con upload.single('archivo')
   }
-  return axios.post(`${API_URL}/presupuestos`, formData, {
+   return apiClient.post('/presupuestos', formData, {
     headers: { 'Content-Type': 'multipart/form-data' }
   });
 };
@@ -45,11 +43,11 @@ export const actualizarPresupuesto = (id, data, file) => {
   // Siempre enviar el flag removeFile (true/false)
   formData.append('removeFile', data.removeFile ? 'true' : 'false');
 
-  return axios.put(`${API_URL}/presupuestos/${id}`, formData, {
+  return apiClient.put(`/presupuestos/${id}`, formData, {
     headers: { 'Content-Type': 'multipart/form-data' }
   });
 };
 
 export const eliminarPresupuesto = (id) => {
-  return axios.delete(`${API_URL}/presupuestos/${id}`);
+  return apiClient.delete(`/presupuestos/${id}`);
 };

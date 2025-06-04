@@ -5,8 +5,7 @@ const cors = require('cors');
 const path = require('path');
 const multer = require('multer');
 const fs = require('fs');
-const authRoutes = require('./routes/authRoutes');
-const presupuestoRoutes = require('./routes/presupuestoRoutes')(upload);
+
 
 const app = express();
 
@@ -80,10 +79,12 @@ const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 },
 });
 
+const authRoutes = require('./routes/authRoutes');
+const presupuestoRoutes = require('./routes/presupuestoRoutes')(upload);
 
 // 4) Rutas
 //    Pasaremos `upload.single('archivo')` en aquellas rutas que admitan adjuntar archivo
-app.use('/api/presupuestos', presupuestoRoutes, require('./routes/presupuestoRoutes')(upload));
+app.use('/api/presupuestos', require('./routes/presupuestoRoutes')(upload), presupuestoRoutes );
 app.use('/api/auth', authRoutes);
 //app.use('/api/presupuestos', presupuestoRoutes);
 
