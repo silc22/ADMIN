@@ -1,8 +1,3 @@
-diff --git a//dev/null b/README.md
-index 0000000000000000000000000000000000000000..ff040f7b67bae54c6b8c0d2806dc402c7030fdba 100644
---- a//dev/null
-+++ b/README.md
-@@ -0,0 +1,49 @@
 # Presupuestos CRUD
 
 This project is split into a backend built with Express and MongoDB and a React frontend. The root `package.json` provides a `dev` script that runs both parts concurrently.
