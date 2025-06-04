@@ -66,9 +66,18 @@ const fileFilter = (req, file, cb) => {
 
 const upload = multer({
   storage,
-  fileFilter,
-  limits: { fileSize: 5 * 1024 * 1024 } // 5 MB máximo
+  fileFilter: (req, file, cb) => {
+    const allowed = ['application/pdf', 'image/jpeg', 'image/png'];
+    if (!allowed.includes(file.mimetype)) {
+      // Almacenar mensaje en req.fileValidationError
+      req.fileValidationError = 'Tipo de archivo no soportado. Solo PDF, JPG, PNG.';
+      return cb(null, false);
+    }
+    cb(null, true);
+  },
+  limits: { fileSize: 5 * 1024 * 1024 },
 });
+
 
 // 4) Rutas
 //    Pasaremos `upload.single('archivo')` en aquellas rutas que admitan adjuntar archivo

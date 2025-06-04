@@ -111,6 +111,11 @@ exports.crearPresupuesto = async (req, res) => {
     const presupuestoGuardado = await nuevoPresupuesto.save();
     res.status(201).json(presupuestoGuardado);
   } catch (error) {
+    // Si es un ValidationError de Mongoose:
+    if (err.name === 'ValidationError') {
+      const mensajes = Object.values(err.errors).map((e) => e.message);
+      return res.status(400).json({ errors: mensajes });
+    }
     console.error(error);
     res.status(500).json({ mensaje: 'Error al crear presupuesto' });
   }
@@ -167,6 +172,11 @@ exports.actualizarPresupuesto = async (req, res) => {
     const actualizado = await presupuesto.save();
     res.json(actualizado);
   } catch (error) {
+    // Si es un ValidationError de Mongoose:
+    if (err.name === 'ValidationError') {
+      const mensajes = Object.values(err.errors).map((e) => e.message);
+      return res.status(400).json({ errors: mensajes });
+    }
     console.error(error);
     res.status(500).json({ mensaje: 'Error al actualizar presupuesto' });
   }

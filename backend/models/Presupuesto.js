@@ -8,25 +8,34 @@ const PresupuestoSchema = new mongoose.Schema({
   },
   titulo: {
     type: String,
+    trim: true,
     default: '',
-    trim: true
+    minlength: [2, 'El título debe tener al menos 2 caracteres.'],
+    maxlength: [100, 'El título no puede superar 100 caracteres.']
   },
   cliente: {
     type: String,
-    required: true,
-    trim: true
+    required: [true, 'El campo cliente es obligatorio.'],
+    trim: true,
+    minlength: [3, 'El cliente debe tener al menos 3 caracteres.'],
+    maxlength: [100, 'El cliente no puede superar 100 caracteres.']
   },
   descripcion: {
     type: String,
-    default: ''
+    default: '',
+    maxlength: [500, 'La descripción no puede superar 500 caracteres.']
   },
   monto: {
     type: Number,
-    required: true
+    required: [true, 'El campo monto es obligatorio.'],
+    min: [0, 'El monto no puede ser negativo.']
   },
   estado: {
     type: String,
-    enum: ['pendiente', 'aprobado', 'rechazado'],
+    enum: {
+      values: ['pendiente', 'aprobado', 'rechazado'],
+      message: 'Estado inválido.'
+    },
     default: 'pendiente'
   },
   fechaCreacion: {
