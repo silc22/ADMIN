@@ -197,14 +197,12 @@ exports.eliminarPresupuesto = async (req, res) => {
     if (!presupuesto) {
       return res.status(404).json({ mensaje: 'Presupuesto no encontrado' });
     }
-
+    
     // Si no es admin Y no es dueño, denegar
     if (req.user.role !== 'admin' && presupuesto.owner.toString() !== req.user.id) {
       return res.status(403).json({ errors: [{ msg: 'No autorizado.' }] });
     }
     
-    const deletedIdentifier = presupuesto.identifier;
-
     // 2) Si tenía un archivo adjunto, lo borramos del disco
     if (presupuesto.archivo && presupuesto.archivo.filename) {
       const filePath = path.join(__dirname, '..', 'uploads', presupuesto.archivo.filename);
@@ -212,14 +210,15 @@ exports.eliminarPresupuesto = async (req, res) => {
         fs.unlinkSync(filePath);
       }
     }
-
+    
     // 3) Eliminamos el documento
     await Presupuesto.findByIdAndDelete(id);
-
+    
     // 4) Comprobamos cuántos presupuestos quedan
     const remainingCount = await Presupuesto.countDocuments();
-
+    
     // 5) Obtenemos el documento del contador
+    const deletedIdentifier = presupuesto.identifier;
     const counterDoc = await Counter.findById('presupuestoId');
     if (!counterDoc) {
       // Si el contador no existe, crearlo en 0 (no debería pasar, pero por si acaso)
