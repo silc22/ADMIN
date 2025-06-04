@@ -55,15 +55,6 @@ const storage = multer.diskStorage({
   }
 });
 
-// EJEMPLO: solo permitir PDF
-const fileFilter = (req, file, cb) => {
-  const allowed = ['application/pdf', 'image/jpeg', 'image/png'];
-  if (allowed.includes(file.mimetype)) {
-    cb(null, true);
-  } else {
-    cb(new Error('Tipo de archivo no soportado'), false);
-  }
-};
 
 const upload = multer({
   storage,
@@ -73,25 +64,21 @@ const upload = multer({
       // Almacenar mensaje en req.fileValidationError
       req.fileValidationError = 'Tipo de archivo no soportado. Solo PDF, JPG, PNG.';
       return cb(null, false);
-    }
+    } 
     cb(null, true);
   },
   limits: { fileSize: 5 * 1024 * 1024 },
 });
 
-const authRoutes = require('./routes/authRoutes');
-const presupuestoRoutes = require('./routes/presupuestoRoutes')(upload);
 
 // 4) Rutas
-//    Pasaremos `upload.single('archivo')` en aquellas rutas que admitan adjuntar archivo
-app.use('/api/presupuestos', require('./routes/presupuestoRoutes')(upload), presupuestoRoutes );
-app.use('/api/auth', authRoutes);
-//app.use('/api/presupuestos', presupuestoRoutes);
+app.use('/api/presupuestos', require('./routes/presupuestoRoutes')(upload) );
+app.use('/api/auth', require('./routes/authRoutes'));
 
 // 5) Ruta de prueba
-app.get('/', (req, res) => {
-  res.send('API de Presupuestos con adjuntos funcionando');
-});
+// app.get('/', (req, res) => {
+//   res.send('API de Presupuestos con adjuntos funcionando');
+// });
 
 app.use((error, req, res, next) => {
   if (error.code === 'LIMIT_FILE_SIZE') {
