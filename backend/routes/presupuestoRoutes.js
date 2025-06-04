@@ -1,6 +1,7 @@
 const express = require('express');
 const { body, param, validationResult } = require('express-validator');
 const router = express.Router();
+const authMiddleware = require('../middleware/authMiddleware');
 
 module.exports = (upload) => {
   // Importamos las funciones del controlador
@@ -30,6 +31,7 @@ module.exports = (upload) => {
   // POST /api/presupuestos       ⇒ Crear nuevo (admite archivo único en “archivo”)
   router.post(
     '/',
+    authMiddleware,
     upload.single('archivo'),
     [
       body('titulo')
@@ -76,6 +78,7 @@ module.exports = (upload) => {
   // PUT /api/presupuestos/:id    ⇒ Actualizar (admite reemplazar/añadir archivo)
    router.put(
     '/:id',
+    authMiddleware,
     upload.single('archivo'),
     [
       param('id', 'ID inválido').isMongoId(),
@@ -125,6 +128,7 @@ module.exports = (upload) => {
   // DELETE /api/presupuestos/:id ⇒ Eliminar
  router.delete(
     '/:id',
+    authMiddleware,
     [ param('id', 'ID inválido').isMongoId() ],
     (req, res, next) => {
       const errors = validationResult(req);
