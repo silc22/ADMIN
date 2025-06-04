@@ -21,7 +21,7 @@ function BudgetItem({ presupuesto, onEliminar }) {
 
   // Función para ir a la página de edición
   const handleEditar = () => {
-    navigate(`/editar-presupuesto/${_id}`);
+    navigate(`/presupuestos/editar/${_id}`);
   };
 
   // Construir base de la URL (o usar env var)
@@ -29,7 +29,7 @@ function BudgetItem({ presupuesto, onEliminar }) {
 
   return (
     <div>
-      <div class="py-2 px-2 bg-white rounded-md shadow-md space-y-2 sm:py-4 sm:flex sm:items-center sm:space-y-0 sm:space-x-6" >
+      <div className ="py-2 px-2 bg-white rounded-md shadow-md space-y-2 sm:py-4 sm:flex sm:items-center sm:space-y-0 sm:space-x-6" >
       <h3 className="text-xl font-semibold">
         {identifier} {titulo ? `- ${titulo}` : ''}
       </h3>
@@ -67,7 +67,7 @@ function BudgetItem({ presupuesto, onEliminar }) {
       <div style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem' }}>
         <button
           onClick={handleEditar}
-          class="mt-4 px-4 py-2 rounded-md bg-blue-500 hover:bg-blue-700 text-white"
+          className ="mt-4 px-4 py-2 rounded-md bg-blue-500 hover:bg-blue-700 text-white"
           style={{
             cursor: 'pointer'
           }}
@@ -76,7 +76,7 @@ function BudgetItem({ presupuesto, onEliminar }) {
         </button>
         <button
           onClick={handleEliminar}
-          class="mt-4 px-4 py-2 rounded-md bg-red-500 hover:bg-red-700 text-white"
+          className ="mt-4 px-4 py-2 rounded-md bg-red-500 hover:bg-red-700 text-white"
           style={{
             cursor: 'pointer'
           }}

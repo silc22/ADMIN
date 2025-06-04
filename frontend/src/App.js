@@ -19,6 +19,12 @@ function App() {
         <div className="flex items-center space-x-4">
           {token ? (
             <>
+              <Link
+                to="/presupuestos/nuevo"
+                className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600"
+              >
+                Nuevo Presupuesto
+              </Link>
               <span className="text-gray-700">Hola, {usuario?.nombre || usuario?.email}</span>
               <button
                 onClick={logout}
