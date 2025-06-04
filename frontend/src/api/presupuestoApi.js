@@ -2,11 +2,14 @@ import axios from 'axios';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
-export const getPresupuestos = (query = '') => {
-  const url = query && query.trim() !== ''
-    ? `${API_URL}/presupuestos?q=${encodeURIComponent(query.trim())}`
-    : `${API_URL}/presupuestos`;
-  return axios.get(url);
+export const getPresupuestos = ({ q = '', page = 1, limit = 10 } = {}) => {
+  const params = {};
+  if (q && q.trim() !== '') {
+    params.q = q.trim();
+  }
+  params.page = page;
+  params.limit = limit;
+  return axios.get(`${API_URL}/presupuestos`, { params });
 };
 
 export const getPresupuestoPorId = (id) => {
@@ -29,9 +32,6 @@ export const crearPresupuesto = (data, file) => {
   });
 };
 
-
-//Actualizar un presupuesto
-// Ahora recibe data, file; data.removeFile indica si debe borrar el adjunto
 export const actualizarPresupuesto = (id, data, file) => {
   const formData = new FormData();
   formData.append('titulo', data.titulo);
@@ -50,8 +50,6 @@ export const actualizarPresupuesto = (id, data, file) => {
   });
 };
 
-
-//  eliminar un presupuesto por ID
 export const eliminarPresupuesto = (id) => {
   return axios.delete(`${API_URL}/presupuestos/${id}`);
 };

@@ -1,7 +1,6 @@
 // backend/routes/presupuestoRoutes.js
 const express = require('express');
 const router = express.Router();
-const path = require('path');
 
 module.exports = (upload) => {
   // Importamos las funciones del controlador

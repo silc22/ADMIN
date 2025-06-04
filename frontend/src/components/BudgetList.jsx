@@ -1,5 +1,5 @@
 // src/components/BudgetList.jsx
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { getPresupuestos } from '../api/presupuestoApi';
 import BudgetItem from './BudgetItem';
 
@@ -7,94 +7,98 @@ function BudgetList() {
   const [presupuestos, setPresupuestos] = useState([]);
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState(null);
-
-  // Nuevo estado para la búsqueda
   const [searchTerm, setSearchTerm] = useState('');
-  // Estado para saber si actualmente se está haciendo una búsqueda (opcional)
   const [buscando, setBuscando] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [perPage] = useState(10); // elementos por página (puedes hacerlo dinámico si quieres)
+  const [totalPages, setTotalPages] = useState(1);
+
 
   // --- Función que consulta la API, recibiendo opcionalmente un texto de búsqueda ---
-  const fetchPresupuestos = async (query = '') => {
-    try {
-      setError(null);
-      if (query.trim() !== '') {
+  const fetchPresupuestos = useCallback(
+    async (q = '', page = 1) => {
+      try {
+        setError(null);
+        setCargando(true)
         setBuscando(true);
-      } else {
-        setCargando(true);
+
+        const respuesta = await getPresupuestos({
+          q,
+          page,
+          limit: perPage
+        });
+
+        setPresupuestos(respuesta.data.data);
+        setTotalPages(respuesta.data.pagination.totalPages);
+      } catch (err) {
+        console.error(err);
+        setError('Error al cargar presupuestos');
+        setPresupuestos([]);
+        setTotalPages(1);
+      } finally {
+        setCargando(false)
+        setBuscando(false);
       }
+    },
+    [perPage] // sólo cambia si cambia perPage
+  );
 
-      // Llamamos a la API pasándole la query como ?q=…
-      const respuesta = await getPresupuestos(query);
-      setPresupuestos(respuesta.data);
-    } catch (err) {
-      console.error(err);
-      setError('Error al cargar presupuestos');
-    } finally {
-      setCargando(false);
-      setBuscando(false);
-    }
-  };
-
-  // Al montar el componente, cargamos sin filtro
+  // 2) Usamos el useEffect incluyendo fetchPresupuestos en dependencias
   useEffect(() => {
-    fetchPresupuestos();
-  }, []);
+    fetchPresupuestos(searchTerm, currentPage);
+  }, [searchTerm, currentPage, fetchPresupuestos]);
+
 
   // Manejador para el formulario de búsqueda
   const handleBuscar = (e) => {
     e.preventDefault();
-    // Disparamos la consulta con el término actual
-    fetchPresupuestos(searchTerm);
+    // Cuando cambie la búsqueda, volvemos a la página 1
+    setCurrentPage(1);
+  };
+
+  const handleLimpiar = () => {
+    setSearchTerm('');
+    setCurrentPage(1);
+  };
+
+  // Mover a página anterior
+  const goToPrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage((prev) => prev - 1);
+    }
+  };
+
+   // Mover a página siguiente
+  const goToNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage((prev) => prev + 1);
+    }
   };
 
   return (
     <div>
       {/* --------------------------------------------------------- */}
-      {/* 1) Formulario de búsqueda */}
+      {/* 1) Formulario de busqueda */}
       <form onSubmit={handleBuscar} style={{ marginBottom: '1rem' }}>
         <input
           type="text"
           placeholder="Buscar presupuesto por título, cliente, descripción o estado…"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          style={{
-            padding: '0.5rem',
-            width: '70%',
-            marginRight: '0.5rem',
-            border: '1px solid #ccc',
-            borderRadius: '4px'
-          }}
+          className="flex-1 border rounded px-3 py-2"
         />
         <button
           type="submit"
-          style={{
-            padding: '0.55rem 1rem',
-            border: 'none',
-            background: '#28a745',
-            color: 'white',
-            borderRadius: '4px',
-            cursor: 'pointer'
-          }}
+          disabled={buscando}
+          className="px-4 py-2 bg-btn-primary text-white rounded disabled:opacity-50"
         >
           {buscando ? 'Buscando…' : 'Buscar'}
         </button>
-        {/* Botón para limpiar búsqueda y volver a todos */}
-        {searchTerm.trim() !== '' && (
+        {searchTerm.trim() && (
           <button
             type="button"
-            onClick={() => {
-              setSearchTerm('');
-              fetchPresupuestos(''); // recargar todos sin filtro
-            }}
-            style={{
-              marginLeft: '0.5rem',
-              padding: '0.55rem 1rem',
-              border: 'none',
-              background: '#6c757d',
-              color: 'white',
-              borderRadius: '4px',
-              cursor: 'pointer'
-            }}
+            onClick={handleLimpiar}
+            className="px-4 py-2 bg-gray-500 text-white rounded"
           >
             Limpiar
           </button>
@@ -104,7 +108,7 @@ function BudgetList() {
       {/* --------------------------------------------------------- */}
       {/* 2) Mensajes de carga/​error */}
       {cargando && !buscando && <p>Cargando presupuestos…</p>}
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {error && <p className="text-red-600">{error}</p>}
 
       {/* --------------------------------------------------------- */}
       {/* 3) Mostrar lista filtrada (o vacía si no hay resultados) */}
@@ -113,18 +117,46 @@ function BudgetList() {
       )}
       {!cargando && presupuestos.length > 0 && (
         <div>
-         {presupuestos.map((presupuesto) => (
-          <BudgetItem
-            key={presupuesto._id}
-            presupuesto={presupuesto}
-            onEliminar={() => {
-              // Después de borrar, recargamos sin filtro actual
-              // (o podrías recargar 'searchTerm' si quieres mantener la búsqueda activa).
-              fetchPresupuestos(searchTerm);
-            }}
-          />
-        ))}
+          {presupuestos.map((presupuesto) => (
+            <BudgetItem
+              key={presupuesto._id}
+              presupuesto={presupuesto}
+              onEliminar={() => fetchPresupuestos(searchTerm, currentPage)}
+            />
+          ))}
         </div>
+      )}
+      {/* Controles de paginación */}
+      {!cargando && presupuestos.length > 0 && (
+        <div className="mt-6 flex justify-center items-center space-x-4">
+          <button
+            onClick={goToPrevPage}
+            disabled={currentPage === 1}
+            className={`px-3 py-1 rounded ${
+              currentPage === 1
+                ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
+                : 'bg-btn-primary text-white hover:bg-btn-primary/90'
+            }`}
+          >
+            Anterior
+          </button>
+
+          <span className="text-gray-700">
+            Página {currentPage} de {totalPages}
+          </span>
+
+          <button
+            onClick={goToNextPage}
+            disabled={currentPage === totalPages}
+            className={`px-3 py-1 rounded ${
+              currentPage === totalPages
+                ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
+                : 'bg-btn-primary text-white hover:bg-btn-primary/90'
+            }`}
+          >
+            Siguiente
+          </button>
+      </div>
       )}
     </div>
   );

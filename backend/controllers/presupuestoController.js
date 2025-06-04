@@ -6,7 +6,10 @@ const path = require('path');
 // Listar todos los presupuestos
 exports.obtenerPresupuestos = async (req, res) => {
   try {
-    const { q } = req.query;
+    const { q, page = 1, limit = 10 } = req.query;
+    const pageNum = parseInt(page, 10) < 1 ? 1 : parseInt(page, 10);
+    const limitNum = parseInt(limit, 10) < 1 ? 10 : parseInt(limit, 10);
+
     let filtro = {};
 
     if (q && q.trim() !== '') {
@@ -21,8 +24,31 @@ exports.obtenerPresupuestos = async (req, res) => {
       };
     }
 
-    const presupuestos = await Presupuesto.find(filtro).sort({ fechaCreacion: -1 });
-    res.json(presupuestos);
+     // Contar total de documentos que coinciden
+    const totalCount = await Presupuesto.countDocuments(filtro);
+
+    // Calcular cuántas páginas hay en total
+    const totalPages = Math.ceil(totalCount / limitNum);
+
+    // Calcular skip
+    const skip = (pageNum - 1) * limitNum;
+
+    // Hacer la consulta paginada
+    const presupuestos = await Presupuesto.find(filtro)
+      .sort({ fechaCreacion: -1 })
+      .skip(skip)
+      .limit(limitNum);
+
+    // Devolver resultados junto con metadatos de paginación
+    res.json({
+      data: presupuestos,
+      pagination: {
+        totalCount,
+        totalPages,
+        currentPage: pageNum,
+        perPage: limitNum
+      }
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ mensaje: 'Error al obtener presupuestos' });
