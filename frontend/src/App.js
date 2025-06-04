@@ -7,7 +7,7 @@ import EditBudgetPage from './pages/EditBudgetPage';
 function App() {
   return (
     <Router>
-      <nav class="bg-white dark:bg-gray-800 p-2">
+      <nav className="bg-white dark:bg-gray-800 p-2">
         <Link to="/" class="text-gray-900 dark:text-white m-2">Inicio</Link>
         <Link to="/nuevo-presupuesto" class="text-gray-900 dark:text-white m-2">Nuevo Presupuesto</Link>
       </nav>
