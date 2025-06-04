@@ -13,15 +13,26 @@ exports.obtenerPresupuestos = async (req, res) => {
     let filtro = {};
 
     if (q && q.trim() !== '') {
-      const regexp = new RegExp(q.trim(), 'i');
-      filtro = {
-        $or: [
-          { titulo: regexp },
-          { cliente: regexp },
-          { descripcion: regexp },
-          { estado: regexp }
-        ]
-      };
+      const texto = q.trim();
+      const regexp = new RegExp(texto, 'i');
+
+      // Intentar parsear texto a entero para "identifier"
+      const qInt = parseInt(texto, 10);
+      const buscarPorIdentifier = !isNaN(qInt);
+
+      // Armar el array de condiciones para $or
+      const condiciones = [
+        { titulo: regexp },
+        { cliente: regexp },
+        { descripcion: regexp },
+        { estado: regexp }
+      ];
+
+      if (buscarPorIdentifier) {
+        condiciones.push({ identifier: qInt });
+      }
+
+      filtro = { $or: condiciones };
     }
 
      // Contar total de documentos que coinciden
