@@ -5,11 +5,13 @@ import NewBudgetPage from './pages/NewBudgetPage';
 import EditBudgetPage from './pages/EditBudgetPage'; 
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
+import AdminPage from './pages/AdminPage';
 import PrivateRoute from './components/PrivateRoute';
 import { AuthContext } from './context/AuthContext';
+import AdminRoute from './components/AdminRoute';
 
 function App() {
-  const { token, logout, usuario } = useContext(AuthContext);
+  const { token,usuario, logout  } = useContext(AuthContext);
 
 
  return (
@@ -19,13 +21,26 @@ function App() {
         <div className="flex items-center space-x-4">
           {token ? (
             <>
+              {/* Solo mostrar “Administración” si el rol es admin */}
+              {usuario?.role === 'admin' && (
+                <Link
+                  to="/admin"
+                  className="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+                >
+                  Administración
+                </Link>
+              )}
+
               <Link
                 to="/presupuestos/nuevo"
                 className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600"
               >
                 Nuevo Presupuesto
               </Link>
-              <span className="text-gray-700">Hola, {usuario?.nombre || usuario?.email}</span>
+
+              <span className="text-gray-700">
+                Hola, {usuario?.nombre || usuario?.email}
+              </span>
               <button
                 onClick={logout}
                 className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
@@ -34,11 +49,17 @@ function App() {
               </button>
             </>
           ) : (
-            <>
-              <Link to="/login" className="px-3 py-1 bg-btn-primary text-white rounded hover:bg-btn-primary/90">
+             <>
+              <Link
+                to="/login"
+                className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+              >
                 Iniciar Sesión
               </Link>
-              <Link to="/register" className="px-3 py-1 bg-btn-success text-white rounded hover:bg-btn-success/90">
+              <Link
+                to="/register"
+                className="px-3 py-1 bg-indigo-500 text-white rounded hover:bg-indigo-600"
+              >
                 Registrarse
               </Link>
             </>
@@ -49,7 +70,7 @@ function App() {
       <div className="p-4">
         <Routes>
           <Route path="/" element={<HomePage />} />
-          {/* Rutas protegidas: crear y editar presupuestos */}
+
           <Route
             path="/presupuestos/nuevo"
             element={
@@ -67,11 +88,19 @@ function App() {
             }
           />
 
-          {/* Rutas de autenticación */}
+          {/* Ruta de administrador */}
+          <Route
+            path="/admin"
+            element={
+              <AdminRoute>
+                <AdminPage />
+              </AdminRoute>
+            }
+          />
+
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
 
-          {/* Ruta de fallback: si no coincide, redirigir a "/" */}
           <Route path="*" element={<HomePage />} />
         </Routes>
       </div>
