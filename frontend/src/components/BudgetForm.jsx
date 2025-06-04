@@ -326,7 +326,7 @@ function BudgetForm({ onSubmit, isSubmitting, initialData = null }) {
       <button
         type="submit"
         disabled={isSubmitting}
-        className="mt-4 px-4 py-2 bg-btn-success text-white rounded hover:bg-btn-success/90 disabled:opacity-50"
+        className="mt-4 px-4 py-2 bg-green-500 hover:bg-green-700 text-white rounded-md"
       >
         {isSubmitting ? 'Guardando…' : 'Guardar Presupuesto'}
       </button>

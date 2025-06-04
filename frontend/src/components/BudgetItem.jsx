@@ -28,13 +28,8 @@ function BudgetItem({ presupuesto, onEliminar }) {
   const baseURL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
   return (
-    <div style={{
-      border: '1px solid #ccc',
-      borderRadius: '8px',
-      padding: '1rem',
-      marginBottom: '1rem',
-      boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
-    }}>
+    <div>
+      <div class="py-2 px-2 bg-white rounded-md shadow-md space-y-2 sm:py-4 sm:flex sm:items-center sm:space-y-0 sm:space-x-6" >
       <h3 className="text-xl font-semibold">
         {identifier} {titulo ? `- ${titulo}` : ''}
       </h3>
@@ -72,12 +67,8 @@ function BudgetItem({ presupuesto, onEliminar }) {
       <div style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem' }}>
         <button
           onClick={handleEditar}
+          class="mt-4 px-4 py-2 rounded-md bg-blue-500 hover:bg-blue-700 text-white"
           style={{
-            padding: '0.5rem 1rem',
-            border: 'none',
-            background: '#007bff',
-            color: 'white',
-            borderRadius: '4px',
             cursor: 'pointer'
           }}
         >
@@ -85,18 +76,15 @@ function BudgetItem({ presupuesto, onEliminar }) {
         </button>
         <button
           onClick={handleEliminar}
+          class="mt-4 px-4 py-2 rounded-md bg-red-500 hover:bg-red-700 text-white"
           style={{
-            padding: '0.5rem 1rem',
-            border: 'none',
-            background: '#dc3545',
-            color: 'white',
-            borderRadius: '4px',
             cursor: 'pointer'
           }}
         >
           Eliminar
         </button>
       </div>
+    </div>
     </div>
   );
 }

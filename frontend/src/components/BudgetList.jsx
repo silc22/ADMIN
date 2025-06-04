@@ -85,7 +85,7 @@ function BudgetList() {
   };
 
   return (
-    <div>
+    <div >
       {/* --------------------------------------------------------- */}
       {/* 1) Formulario de busqueda */}
       <form onSubmit={handleBuscar} style={{ marginBottom: '1rem' }}>
