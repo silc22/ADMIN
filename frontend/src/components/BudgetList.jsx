@@ -4,19 +4,22 @@ import { getPresupuestos } from '../api/presupuestoApi';
 import BudgetItem from './BudgetItem';
 
 function BudgetList() {
+  // Lista de presupuestos y estados de búsqueda
   const [presupuestos, setPresupuestos] = useState([]);
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [buscando, setBuscando] = useState(false);
+
+  // Estados de paginación
   const [currentPage, setCurrentPage] = useState(1);
-  const [perPage] = useState(10); // elementos por página (puedes hacerlo dinámico si quieres)
+  const [itemsPerPage, setItemsPerPage] = useState(10); // elementos por página (puedes hacerlo dinámico si quieres)
   const [totalPages, setTotalPages] = useState(1);
 
 
   // --- Función que consulta la API, recibiendo opcionalmente un texto de búsqueda ---
   const fetchPresupuestos = useCallback(
-    async (q = '', page = 1) => {
+    async (q = '', page = 1, limit = itemsPerPage) => {
       try {
         setError(null);
         setCargando(true)
@@ -25,7 +28,7 @@ function BudgetList() {
         const respuesta = await getPresupuestos({
           q,
           page,
-          limit: perPage
+          limit
         });
 
         setPresupuestos(respuesta.data.data);
@@ -40,13 +43,13 @@ function BudgetList() {
         setBuscando(false);
       }
     },
-    [perPage] // sólo cambia si cambia perPage
+    [itemsPerPage] // sólo cambia si cambia itemsPerPage
   );
 
   // 2) Usamos el useEffect incluyendo fetchPresupuestos en dependencias
   useEffect(() => {
-    fetchPresupuestos(searchTerm, currentPage);
-  }, [searchTerm, currentPage, fetchPresupuestos]);
+    fetchPresupuestos(searchTerm, currentPage, itemsPerPage);
+  }, [searchTerm, currentPage, itemsPerPage, fetchPresupuestos]);
 
 
   // Manejador para el formulario de búsqueda
@@ -73,6 +76,12 @@ function BudgetList() {
     if (currentPage < totalPages) {
       setCurrentPage((prev) => prev + 1);
     }
+  };
+
+  // 4) Cambio en cantidad de ítems por página: reiniciamos a página 1
+  const handleItemsPerPageChange = (e) => {
+    setItemsPerPage(parseInt(e.target.value, 10));
+    setCurrentPage(1);
   };
 
   return (
@@ -104,30 +113,56 @@ function BudgetList() {
           </button>
         )}
       </form>
+      
+      {/* ====== Selector “ítems por página” ====== */}
+      <div className="mb-4 flex items-center gap-2">
+        <label htmlFor="perPageSelect" className="font-medium">
+          Ver
+        </label>
+        <select
+          id="perPageSelect"
+          value={itemsPerPage}
+          onChange={handleItemsPerPageChange}
+          className="border rounded px-2 py-1"
+        >
+          <option value={5}>5</option>
+          <option value={10}>10</option>
+          <option value={20}>20</option>
+          <option value={50}>50</option>
+        </select>
+        <span className="ml-1">por página</span>
+      </div>
+
 
       {/* --------------------------------------------------------- */}
       {/* 2) Mensajes de carga/​error */}
       {cargando && !buscando && <p>Cargando presupuestos…</p>}
       {error && <p className="text-red-600">{error}</p>}
 
+
       {/* --------------------------------------------------------- */}
       {/* 3) Mostrar lista filtrada (o vacía si no hay resultados) */}
-      {!cargando && presupuestos.length === 0 && (
-        <p>No se encontraron presupuestos {searchTerm.trim() ? `para “${searchTerm}”` : ''}.</p>
+      {!cargando && !buscando && presupuestos.length === 0 && (
+        <p>
+          No se encontraron presupuestos {searchTerm.trim()
+          ? `para “${searchTerm}”.` 
+          : 'No hay presupuestos registrados.'}
+        </p>
       )}
-      {!cargando && presupuestos.length > 0 && (
+
+      {!buscando && presupuestos.length > 0 && (
         <div>
           {presupuestos.map((presupuesto) => (
             <BudgetItem
               key={presupuesto._id}
               presupuesto={presupuesto}
-              onEliminar={() => fetchPresupuestos(searchTerm, currentPage)}
+              onEliminar={() => fetchPresupuestos(searchTerm, currentPage, itemsPerPage)}
             />
           ))}
         </div>
       )}
       {/* Controles de paginación */}
-      {!cargando && presupuestos.length > 0 && (
+      {!buscando && presupuestos.length > 0 && (
         <div className="mt-6 flex justify-center items-center space-x-4">
           <button
             onClick={goToPrevPage}

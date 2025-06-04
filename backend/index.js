@@ -27,16 +27,6 @@ mongoose.connect(mongoURI, {
 // Middlewares
 app.use(cors());
 app.use(express.json()); // Para parsear JSON en el body de las peticiones
-app.use((err, req, res, next) => {
-  if (err.code === 'LIMIT_FILE_SIZE') {
-    return res.status(400).json({ mensaje: 'El archivo supera el tamaño máximo (5 MB).' });
-  }
-  if (err.message === 'Tipo de archivo no soportado') {
-    return res.status(400).json({ mensaje: err.message });
-  }
-  // Otros errores:
-  res.status(500).json({ mensaje: err.message || 'Error interno del servidor.' });
-});
 
 
 // 3) Configurar carpeta “uploads” para servir archivos estáticos
@@ -87,6 +77,17 @@ app.use('/api/presupuestos', require('./routes/presupuestoRoutes')(upload));
 // 5) Ruta de prueba
 app.get('/', (req, res) => {
   res.send('API de Presupuestos con adjuntos funcionando');
+});
+
+app.use((err, req, res, next) => {
+  if (err.code === 'LIMIT_FILE_SIZE') {
+    return res.status(400).json({ mensaje: 'El archivo supera el tamaño máximo (5 MB).' });
+  }
+  if (err.message === 'Tipo de archivo no soportado') {
+    return res.status(400).json({ mensaje: err.message });
+  }
+  // Otros errores:
+  res.status(500).json({ mensaje: err.message || 'Error interno del servidor.' });
 });
 
 // Iniciar servidor
