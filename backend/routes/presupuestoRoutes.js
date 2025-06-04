@@ -33,7 +33,7 @@ module.exports = (upload) => {
     upload.single('archivo'),
     [
       body('titulo')
-        .optional()
+        .optional({ checkFalsy: true })
         .isLength({ min: 2, max: 100 })
         .withMessage('El título debe tener entre 2 y 100 caracteres.'),
       body('cliente')
@@ -80,7 +80,7 @@ module.exports = (upload) => {
     [
       param('id', 'ID inválido').isMongoId(),
       body('titulo')
-        .optional()
+        .optional({ checkFalsy: true })
         .isLength({ min: 2, max: 100 })
         .withMessage('El título debe tener entre 2 y 100 caracteres.'),
       body('cliente')

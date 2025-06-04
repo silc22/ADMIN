@@ -45,9 +45,11 @@ function BudgetForm({ onSubmit, isSubmitting, initialData = null }) {
   // Validadores
   const validators = {
     titulo: (value) => {
-      if (!value) return '';
-      if (value.trim().length < 2) return 'El título debe tener al menos 2 caracteres.';
-      return '';
+      // Si no escribe nada, sigue siendo válido
+    if (!value || value.trim() === '') return '';
+    if (value.trim().length < 2) return 'El título debe tener al menos 2 caracteres.';
+    if (value.trim().length > 100) return 'El título no puede superar 100 caracteres.';
+    return '';
     },
     cliente: (value) => {
       if (!value || !value.trim()) return 'El cliente es obligatorio.';

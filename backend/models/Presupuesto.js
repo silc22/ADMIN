@@ -10,8 +10,15 @@ const PresupuestoSchema = new mongoose.Schema({
     type: String,
     trim: true,
     default: '',
-    minlength: [2, 'El título debe tener al menos 2 caracteres.'],
-    maxlength: [100, 'El título no puede superar 100 caracteres.']
+    validate: {
+      validator: function(value) {
+        // Si viene cadena vacía, lo dejamos pasar (campo opcional).
+        if (value === '') return true;
+        // Si hay texto, exigir longitud entre 2 y 100
+        return value.trim().length >= 2 && value.trim().length <= 100;
+      },
+      message: 'El título debe tener entre 2 y 100 caracteres.'
+    }
   },
   cliente: {
     type: String,
@@ -64,8 +71,8 @@ PresupuestoSchema.pre('save', async function(next) {
       // Asignar identifier como número (1, 2, 3, …)
       this.identifier = counter.seq;
       next();
-    } catch (err) {
-      next(err);
+    } catch (error) {
+      next(error);
     }
   } else {
     next();

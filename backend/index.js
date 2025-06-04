@@ -22,7 +22,7 @@ mongoose.connect(mongoURI, {
   useUnifiedTopology: true
 })
   .then(() => console.log('✓ Conectado a MongoDB'))
-  .catch(err => console.error('✗ Error conectando a MongoDB:', err));
+  .catch(error => console.error('✗ Error conectando a MongoDB:', error));
 
 // Middlewares
 app.use(cors());
@@ -88,15 +88,15 @@ app.get('/', (req, res) => {
   res.send('API de Presupuestos con adjuntos funcionando');
 });
 
-app.use((err, req, res, next) => {
-  if (err.code === 'LIMIT_FILE_SIZE') {
+app.use((error, req, res, next) => {
+  if (error.code === 'LIMIT_FILE_SIZE') {
     return res.status(400).json({ mensaje: 'El archivo supera el tamaño máximo (5 MB).' });
   }
-  if (err.message === 'Tipo de archivo no soportado') {
-    return res.status(400).json({ mensaje: err.message });
+  if (error.message === 'Tipo de archivo no soportado') {
+    return res.status(400).json({ mensaje: error.message });
   }
   // Otros errores:
-  res.status(500).json({ mensaje: err.message || 'Error interno del servidor.' });
+  res.status(500).json({ mensaje: error.message || 'Error interno del servidor.' });
 });
 
 // Iniciar servidor

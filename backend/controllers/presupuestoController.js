@@ -112,8 +112,8 @@ exports.crearPresupuesto = async (req, res) => {
     res.status(201).json(presupuestoGuardado);
   } catch (error) {
     // Si es un ValidationError de Mongoose:
-    if (err.name === 'ValidationError') {
-      const mensajes = Object.values(err.errors).map((e) => e.message);
+    if (error.name === 'ValidationError') {
+      const mensajes = Object.values(error.errors).map((e) => e.message);
       return res.status(400).json({ errors: mensajes });
     }
     console.error(error);
@@ -173,8 +173,8 @@ exports.actualizarPresupuesto = async (req, res) => {
     res.json(actualizado);
   } catch (error) {
     // Si es un ValidationError de Mongoose:
-    if (err.name === 'ValidationError') {
-      const mensajes = Object.values(err.errors).map((e) => e.message);
+    if (error.name === 'ValidationError') {
+      const mensajes = Object.values(error.errors).map((e) => e.message);
       return res.status(400).json({ errors: mensajes });
     }
     console.error(error);

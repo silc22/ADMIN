@@ -19,8 +19,8 @@ function EditBudgetPage() {
         setCargando(true);
         const respuesta = await getPresupuestoPorId(id);
         setInitialData(respuesta.data);
-      } catch (err) {
-        console.error(err);
+      } catch (error) {
+        console.error(error);
         setError('Error al cargar el presupuesto');
       } finally {
         setCargando(false);
@@ -35,8 +35,8 @@ function EditBudgetPage() {
       setIsSubmitting(true);
       await actualizarPresupuesto(id, datos, file);
       navigate('/');
-    } catch (err) {
-      console.error(err);
+    } catch (error) {
+      console.error(error);
       alert('Hubo un error al actualizar el presupuesto');
       setIsSubmitting(false);
     }

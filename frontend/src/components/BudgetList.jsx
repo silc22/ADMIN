@@ -33,8 +33,8 @@ function BudgetList() {
 
         setPresupuestos(respuesta.data.data);
         setTotalPages(respuesta.data.pagination.totalPages);
-      } catch (err) {
-        console.error(err);
+      } catch (error) {
+        console.error(error);
         setError('Error al cargar presupuestos');
         setPresupuestos([]);
         setTotalPages(1);
