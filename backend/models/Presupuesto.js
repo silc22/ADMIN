@@ -2,6 +2,11 @@ const mongoose = require('mongoose');
 const Counter = require('./Counter');
 
 const PresupuestoSchema = new mongoose.Schema({
+  owner: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
   identifier: {
     type: Number,
     unique: true

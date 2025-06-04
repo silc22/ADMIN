@@ -74,6 +74,7 @@ const upload = multer({
 // 4) Rutas
 app.use('/api/presupuestos', require('./routes/presupuestoRoutes')(upload) );
 app.use('/api/auth', require('./routes/authRoutes'));
+app.use('/api/users', require('./routes/userRoutes'));
 
 // 5) Ruta de prueba
 // app.get('/', (req, res) => {

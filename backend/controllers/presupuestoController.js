@@ -89,6 +89,7 @@ exports.crearPresupuesto = async (req, res) => {
 
     // Construir nuevo objeto Presupuesto
     const nuevoPresupuesto = new Presupuesto({
+      owner: req.user.id, // <─ asignar owner
       titulo: titulo || '',
       cliente,
       descripcion,
@@ -125,12 +126,16 @@ exports.crearPresupuesto = async (req, res) => {
 exports.actualizarPresupuesto = async (req, res) => {
   try {
     const { id } = req.params;
-    // OJO: campos llegan de FormData, traerán strings (monto como string, removeFile como 'true'/'false')
     const { titulo, cliente, descripcion, monto, estado, removeFile } = req.body;
 
     const presupuesto = await Presupuesto.findById(id);
     if (!presupuesto) {
       return res.status(404).json({ mensaje: 'Presupuesto no encontrado' });
+    }
+
+    // Si no es admin Y no es dueño, denegar
+    if (req.user.role !== 'admin' && presupuesto.owner.toString() !== req.user.id) {
+      return res.status(403).json({ errors: [{ msg: 'No autorizado.' }] });
     }
 
     // Si el usuario marcó “Eliminar archivo actual”

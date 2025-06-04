@@ -20,6 +20,11 @@ const UserSchema = new mongoose.Schema({
     trim: true,
     maxlength: [50, 'El nombre no puede superar 50 caracteres.']
   },
+  role: {
+    type: String,
+    enum: ['user', 'admin'],
+    default: 'user'
+  },
   fechaCreacion: {
     type: Date,
     default: Date.now
