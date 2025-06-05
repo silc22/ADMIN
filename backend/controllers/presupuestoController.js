@@ -6,12 +6,11 @@ const path = require('path');
 // Listar todos los presupuestos
 exports.obtenerPresupuestos = async (req, res) => {
   try {
-    const { q, page = 1, limit = 10 } = req.query;
-    const pageNum = parseInt(page, 10) < 1 ? 1 : parseInt(page, 10);
-    const limitNum = parseInt(limit, 10) < 1 ? 10 : parseInt(limit, 10);
-     
-    // 2) Leer parámetros de filtrado adicionales
-    const {
+    // 1) Extraer de req.query todos los posibles filtros
+    let {
+      q,
+      page = 1,
+      limit = 10,
       estado,
       cliente,
       minImporte,
@@ -20,87 +19,83 @@ exports.obtenerPresupuestos = async (req, res) => {
       fechaHasta
     } = req.query;
 
+    // Convertir page y limit a número
+    page = Number(page);
+    limit = Number(limit);
 
-    let filtro = {};
+    // 2) Construir un objeto "filtros" paso a paso
+    const filtros = {};
 
-    if (q && q.trim() !== '') {
-      const texto = q.trim();
-      const regexp = new RegExp(texto, 'i');
-      filtro.$or = [{ titulo: regexp }, { descripcion: regexp }];
-    }
-      
-    // 4) Filtrar por “estado”
-    if (estado && ['pendiente', 'aprobado', 'rechazado'].includes(estado)) {
-      filtro.estado = estado;
+    // Filtrar por estado exacto
+    if (estado) {
+      filtros.estado = estado;
     }
 
-    // 5) Filtrar por “cliente” (búsqueda parcial, case-insensitive)
-    if (cliente && cliente.trim() !== '') {
-      const clienteRegex = new RegExp(cliente.trim(), 'i');
-      filtro.cliente = clienteRegex;
+    // Filtrar por cliente (regex case-insensitive)
+    if (cliente) {
+      filtros.cliente = { $regex: cliente, $options: 'i' };
     }
 
-    
-    // 6) Filtrar por rango de importe
-    if (minImporte !== undefined || maxImporte !== undefined) {
-      filtro.importe = {};
-      if (minImporte !== undefined && !isNaN(parseFloat(minImporte))) {
-        filtro.importe.$gte = parseFloat(minImporte);
-      }
-      if (maxImporte !== undefined && !isNaN(parseFloat(maxImporte))) {
-        filtro.importe.$lte = parseFloat(maxImporte);
-      }
-      // Si está vacío (por no cumplirse las condiciones), lo eliminamos
-      if (Object.keys(filtro.importe).length === 0) {
-        delete filtro.importe;
+    // Filtrar por rango de importe
+    if (minImporte || maxImporte) {
+      filtros.importe = {};
+      if (minImporte) filtros.importe.$gte = parseFloat(minImporte);
+      if (maxImporte) filtros.importe.$lte = parseFloat(maxImporte);
+    }
+
+    // Filtrar por rango de fechas (fechaCreacion)
+    if (fechaDesde || fechaHasta) {
+      filtros.fechaCreacion = {};
+      if (fechaDesde) filtros.fechaCreacion.$gte = new Date(fechaDesde);
+      if (fechaHasta) filtros.fechaCreacion.$lte = new Date(fechaHasta);
+    }
+
+    // 3) Filtrar “q” contra título, descripción, cliente y ahora también identifier
+    if (q) {
+      // 3.1) Crear un regex a partir de q (case-insensitive)
+      const regex = new RegExp(q, 'i');
+
+      // 3.2) Si q es solo dígitos, parsearlo a número
+      const qNum = /^\d+$/.test(q) ? parseInt(q, 10) : null;
+
+      // 3.3) Armar el array $or inicial (titulo, descripcion, cliente)
+      filtros.$or = [
+        { titulo:      { $regex: regex } },
+        { descripcion: { $regex: regex } },
+        { cliente:     { $regex: regex } }
+      ];
+
+      // 3.4) Si qNum no es null, añadir la comparación exacta de identifier
+      if (qNum !== null) {
+        filtros.$or.push({ identifier: qNum });
       }
     }
 
-    // 7) Filtrar por rango de fecha de creación
-    if ((fechaDesde && !isNaN(new Date(fechaDesde))) || (fechaHasta && !isNaN(new Date(fechaHasta)))) {
-      filtro.fechaCreacion = {};
-      if (fechaDesde && !isNaN(new Date(fechaDesde))) {
-        filtro.fechaCreacion.$gte = new Date(fechaDesde);
-      }
-      if (fechaHasta && !isNaN(new Date(fechaHasta))) {
-        // Para incluir todo el día “fechaHasta”, ponemos 23:59:59
-        const hasta = new Date(fechaHasta);
-        hasta.setHours(23, 59, 59, 999);
-        filtro.fechaCreacion.$lte = hasta;
-      }
-      if (Object.keys(filtro.fechaCreacion).length === 0) {
-        delete filtro.fechaCreacion;
-      }
-    }
+    // 4) Calcular cuántos documentos hay en total para paginar
+    const totalDocs = await Presupuesto.countDocuments(filtros);
 
-     // Contar total de documentos que coinciden
-    const totalCount = await Presupuesto.countDocuments(filtro);
+    // 5) Calcular skip y limit para la página actual
+    const skip = (page - 1) * limit;
 
-    // Calcular cuántas páginas hay en total
-    const totalPages = Math.ceil(totalCount / limitNum);
-
-    // Calcular skip
-    const skip = (pageNum - 1) * limitNum;
-
-    // Hacer la consulta paginada
-    const presupuestos = await Presupuesto.find(filtro)
-      .sort({ fechaCreacion: -1 })
+    // 6) Hacer la consulta con los filtros, orden, skip y limit
+    const data = await Presupuesto.find(filtros)
+      .sort({ identifier: -1 }) // opcional: ordenar por número descendente
       .skip(skip)
-      .limit(limitNum);
+      .limit(limit);
 
-    // Devolver resultados junto con metadatos de paginación
-    res.json({
-      data: presupuestos,
+    // 7) Devolver la respuesta con data y datos de paginación
+    return res.json({
+      data,
       pagination: {
-        totalCount,
-        totalPages,
-        currentPage: pageNum,
-        perPage: limitNum
+        totalDocs,
+        limit,
+        page,
+        totalPages: Math.ceil(totalDocs / limit)
       }
     });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ mensaje: 'Error al obtener presupuestos' });
+  } catch (err) {
+    console.error('Error en obtenerPresupuestos:', err);
+    return res.status(500).json({ mensaje: 'Error del servidor' });
   }
 };
 

@@ -28,20 +28,23 @@ function BudgetItem({ presupuesto, onEliminar }) {
   const baseURL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
   return (
-    <tr className="hover:bg-gray-50">
+    <tr className="hover:bg-gray-200">
       {/* 1. Número de Presupuesto */}
-      <td className="border px-4 py-2">
-        {identifier} {titulo ? `- ${titulo}` : ''}
+      <td className="border px-4 py-2 text-white">
+        {identifier} 
+      </td>
+      <td className="border px-4 py-2 text-white">
+        {titulo ? `${titulo}` : ''}
       </td>
 
       {/* 2. Cliente */}
-      <td className="border px-4 py-2">{cliente}</td>
+      <td className="border px-4 py-2 text-white ">{cliente}</td>
 
       {/* 3. Descripción */}
-      <td className="border px-4 py-2">{descripcion}</td>
+      <td className="border px-4 py-2 text-white ">{descripcion}</td>
 
       {/* 4. Archivo */}
-      <td className="border px-4 py-2">
+      <td className="border px-4 py-2 text-white">
         {archivo && archivo.url ? (
           <a
             href={`${baseURL}${archivo.url}`}
