@@ -32,6 +32,12 @@ function BudgetItem({ presupuesto, onEliminar }) {
   // Construir base de la URL (o usar env var)
   const baseURL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
+  const textoCorto = descripcion
+  ? (descripcion.length > 30
+      ? descripcion.slice(0, 30) + '...'
+      : descripcion)
+  : '';
+
   return (
     <tr className="hover:bg-gray-200">
       {/* 1. Número de Presupuesto */}
@@ -50,7 +56,7 @@ function BudgetItem({ presupuesto, onEliminar }) {
 
       {/* 3. Descripción */}
       <td className="border px-4 py-2 text-white ">
-        {descripcion}
+        {textoCorto}
       </td>
 
       {/* 4. Archivo */}

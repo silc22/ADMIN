@@ -40,7 +40,7 @@ function App() {
               </Link>
 
               <span className="text-gray-700">
-                Hola, {usuario?.nombre || usuario?.email}
+                {usuario?.nombre || usuario?.email}
               </span>
               <button
                 onClick={logout}
