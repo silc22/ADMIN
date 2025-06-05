@@ -25,11 +25,7 @@ function BudgetList() {
         setCargando(true)
         setBuscando(true);
 
-        const respuesta = await getPresupuestos({
-          q,
-          page,
-          limit
-        });
+        const respuesta = await getPresupuestos({ q, page, limit });
 
         setPresupuestos(respuesta.data.data);
         setTotalPages(respuesta.data.pagination.totalPages);
@@ -150,15 +146,36 @@ function BudgetList() {
         </p>
       )}
 
+      {/* ----- Tabla de presupuestos ----- */}
       {!buscando && presupuestos.length > 0 && (
-        <div>
-          {presupuestos.map((presupuesto) => (
-            <BudgetItem
-              key={presupuesto._id}
-              presupuesto={presupuesto}
-              onEliminar={() => fetchPresupuestos(searchTerm, currentPage, itemsPerPage)}
-            />
-          ))}
+        <div className="overflow-x-auto">
+          <table className="w-full table-auto border-collapse">
+            <thead>
+              <tr className="bg-gray-200 text-gray-700">
+                <th className="border px-4 py-2 text-left">
+                  Número de Presupuesto
+                </th>
+                <th className="border px-4 py-2 text-left">Cliente</th>
+                <th className="border px-4 py-2 text-left">Descripción</th>
+                <th className="border px-4 py-2 text-left">Archivo</th>
+                <th className="border px-4 py-2 text-right">Importe (€)</th>
+                <th className="border px-4 py-2 text-left">Estado</th>
+                <th className="border px-4 py-2 text-left">F. de Creación</th>
+                <th className="border px-4 py-2 text-center">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {presupuestos.map((presupuesto) => (
+                <BudgetItem
+                  key={presupuesto._id}
+                  presupuesto={presupuesto}
+                  onEliminar={() =>
+                    fetchPresupuestos(searchTerm, currentPage, itemsPerPage)
+                  }
+                />
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
       {/* Controles de paginación */}

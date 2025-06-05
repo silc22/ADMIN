@@ -28,64 +28,72 @@ function BudgetItem({ presupuesto, onEliminar }) {
   const baseURL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
   return (
-    <div>
-      <div className ="py-2 px-2 bg-white rounded-md shadow-md space-y-2 sm:py-4 sm:flex sm:items-center sm:space-y-0 sm:space-x-6" >
-      <h3 className="text-xl font-semibold">
+    <tr className="hover:bg-gray-50">
+      {/* 1. Número de Presupuesto */}
+      <td className="border px-4 py-2">
         {identifier} {titulo ? `- ${titulo}` : ''}
-      </h3>
-      <p><strong>Cliente:</strong> {cliente}</p>
-      <p>{descripcion}</p>
-      <p><strong>importe:</strong> € {importe.toFixed(2)}</p>
-      <p><strong>Estado:</strong> {estado}</p>
-      <p><small>Creado el: {fecha}</small></p>
+      </td>
 
-      {archivo && archivo.url && (
-        <div style={{ marginTop: '0.5rem' }}>
-          {archivo.mimeType.startsWith('image/') ? (
-            // Miniatura
-            <img
-              src={`${baseURL}${archivo.url}`}
-              alt={archivo.originalName}
-              style={{ maxWidth: '150px', maxHeight: '100px', display: 'block', marginBottom: '0.5rem' }}
-            />
-          ) : null}
+      {/* 2. Cliente */}
+      <td className="border px-4 py-2">{cliente}</td>
 
-          {/* Enlace de descarga */}
-          <p>
-            <strong>Adjunto:</strong>{' '}
-            <a
-              href={`${baseURL}${archivo.url}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {archivo.originalName || 'Descargar archivo'}
-            </a>
-          </p>
-        </div>
-      )}
+      {/* 3. Descripción */}
+      <td className="border px-4 py-2">{descripcion}</td>
 
-      <div style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem' }}>
+      {/* 4. Archivo */}
+      <td className="border px-4 py-2">
+        {archivo && archivo.url ? (
+          <a
+            href={`${baseURL}${archivo.url}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 underline text-sm"
+          >
+            {archivo.originalName || 'Ver archivo'}
+          </a>
+        ) : (
+          <span className="text-gray-500 text-sm">Sin archivo</span>
+        )}
+      </td>
+
+      {/* 5. Importe */}
+      <td className="border px-4 py-2 text-right">
+        {importe.toFixed(2)}
+      </td>
+
+      {/* 6. Estado */}
+      <td className="border px-4 py-2">
+        <span
+          className={`
+            px-2 py-1 rounded-full text-sm font-semibold
+            ${estado === 'pendiente' ? 'bg-yellow-200 text-yellow-800' : ''}
+            ${estado === 'aprobado' ? 'bg-green-200 text-green-800' : ''}
+            ${estado === 'rechazado' ? 'bg-red-200 text-red-800' : ''}
+          `}
+        >
+          {estado.charAt(0).toUpperCase() + estado.slice(1)}
+        </span>
+      </td>
+
+      {/* 7. F. de Creación */}
+      <td className="border px-4 py-2">{fecha}</td>
+
+      {/* 8. Acciones (Editar / Eliminar) */}
+      <td className="border px-4 py-2 text-center space-x-2">
         <button
           onClick={handleEditar}
-          className ="mt-4 px-4 py-2 rounded-md bg-blue-500 hover:bg-blue-700 text-white"
-          style={{
-            cursor: 'pointer'
-          }}
+          className="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded text-sm"
         >
           Editar
         </button>
         <button
           onClick={handleEliminar}
-          className ="mt-4 px-4 py-2 rounded-md bg-red-500 hover:bg-red-700 text-white"
-          style={{
-            cursor: 'pointer'
-          }}
+          className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded text-sm"
         >
           Eliminar
         </button>
-      </div>
-    </div>
-    </div>
+      </td>
+    </tr>
   );
 }
 
