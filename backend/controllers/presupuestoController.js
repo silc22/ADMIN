@@ -45,9 +45,24 @@ exports.obtenerPresupuestos = async (req, res) => {
 
     // Filtrar por rango de fechas (fechaCreacion)
     if (fechaDesde || fechaHasta) {
-      filtros.fechaCreacion = {};
-      if (fechaDesde) filtros.fechaCreacion.$gte = new Date(fechaDesde);
-      if (fechaHasta) filtros.fechaCreacion.$lte = new Date(fechaHasta);
+    filtros.fechaCreacion = {};
+
+    if (fechaDesde && !isNaN(new Date(fechaDesde))) {
+      // >= inicio de fechaDesde (00:00:00.000)
+      filtros.fechaCreacion.$gte = new Date(fechaDesde);
+    }
+
+    if (fechaHasta && !isNaN(new Date(fechaHasta))) {
+      // <= final de fechaHasta (23:59:59.999)
+      const hasta = new Date(fechaHasta);
+      hasta.setHours(23, 59, 59, 999);
+      filtros.fechaCreacion.$lte = hasta;
+    }
+
+    // Si por alguna razón no quedó ninguna clave dentro de filtros.fechaCreacion, la eliminamos
+    if (Object.keys(filtros.fechaCreacion).length === 0) {
+      delete filtros.fechaCreacion;
+    }
     }
 
     // 3) Filtrar “q” contra título, descripción, cliente y ahora también identifier
@@ -110,10 +125,10 @@ exports.getResumenPresupuestos = async (req, res) => {
       filtro.$or = [{ titulo: regexp }, { descripcion: regexp }];
     }
     if (estado && ['pendiente', 'aprobado', 'rechazado'].includes(estado)) {
-      if (cliente && cliente.trim() !== '') {
-        filtro.cliente = new RegExp(cliente.trim(), 'i');
-      }
       filtro.estado = estado;
+    }
+    if (cliente && cliente.trim() !== '') {
+        filtro.cliente = new RegExp(cliente.trim(), 'i');
     }
     if (minImporte !== undefined || maxImporte !== undefined) {
       filtro.importe = {};
@@ -127,9 +142,9 @@ exports.getResumenPresupuestos = async (req, res) => {
     }
     if ((fechaDesde && !isNaN(new Date(fechaDesde))) || (fechaHasta && !isNaN(new Date(fechaHasta)))) {
       filtro.fechaCreacion = {};
-      if (fechaDesde && !isNaN(new Date(fechaDesde))) {
-        filtro.fechaCreacion.$gte = new Date(fechaDesde);
-      }
+    if (fechaDesde && !isNaN(new Date(fechaDesde))) {
+      filtro.fechaCreacion.$gte = new Date(fechaDesde);
+    }
       if (fechaHasta && !isNaN(new Date(fechaHasta))) {
         const hasta = new Date(fechaHasta);
         hasta.setHours(23, 59, 59, 999);
