@@ -1,5 +1,6 @@
 // src/components/BudgetForm.jsx
 import { useState, useEffect } from 'react';
+import { Link } from "react-router-dom";
 
 function BudgetForm({ onSubmit, isSubmitting, initialData = null }) {
   // Inicialmente, si no hay initialData definimos todos los estados vacíos
@@ -330,6 +331,15 @@ function BudgetForm({ onSubmit, isSubmitting, initialData = null }) {
       >
         {isSubmitting ? 'Guardando…' : 'Guardar Presupuesto'}
       </button>
+      <button className="mt-4 px-4 py-2 bg-gray-500 hover:bg-gray-700 text-white rounded-md">
+        <Link 
+          to="/presupuestos"
+        >
+          ← Volver
+        </Link>
+      </button>
+      
+
     </form>
   );
 }

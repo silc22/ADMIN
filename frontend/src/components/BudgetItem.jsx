@@ -24,6 +24,11 @@ function BudgetItem({ presupuesto, onEliminar }) {
     navigate(`/presupuestos/editar/${_id}`);
   };
 
+  // Navegar a página de detalle
+  const handleDetalle = () => {
+    navigate(`/presupuestos/${_id}`);
+  };
+
   // Construir base de la URL (o usar env var)
   const baseURL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
@@ -33,15 +38,20 @@ function BudgetItem({ presupuesto, onEliminar }) {
       <td className="border px-4 py-2 text-white">
         {identifier} 
       </td>
+
       <td className="border px-4 py-2 text-white">
         {titulo ? `${titulo}` : ''}
       </td>
 
       {/* 2. Cliente */}
-      <td className="border px-4 py-2 text-white ">{cliente}</td>
+      <td className="border px-4 py-2 text-white ">
+        {cliente}
+      </td>
 
       {/* 3. Descripción */}
-      <td className="border px-4 py-2 text-white ">{descripcion}</td>
+      <td className="border px-4 py-2 text-white ">
+        {descripcion}
+      </td>
 
       {/* 4. Archivo */}
       <td className="border px-4 py-2 text-white">
@@ -88,6 +98,12 @@ function BudgetItem({ presupuesto, onEliminar }) {
           className="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded text-sm"
         >
           Editar
+        </button>
+        <button 
+          onClick={handleDetalle} 
+          className="px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600"
+        >
+          Detalle
         </button>
         <button
           onClick={handleEliminar}

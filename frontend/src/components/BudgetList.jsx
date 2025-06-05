@@ -346,18 +346,17 @@ function BudgetList() {
             <tbody>
               {presupuestos.map((p) => (
                 <BudgetItem
-                key={p._id}
-                presupuesto={p}
-                onEliminar={() => {
-                  // Si se elimina un presupuesto, recargo con los últimos filtros + misma página
-                  const params = {
-                    ...lastParams,
-                    page: currentPage,
-                    limit: itemsPerPage
-                  };
-                  loadPresupuestos(params);
-                  loadResumen(params);
-                  }}
+                  key={p._id}
+                  presupuesto={p}
+                  onEliminar={() => {
+                    const params = {
+                      ...lastParams,
+                      page: currentPage,
+                      limit: itemsPerPage
+                    };
+                    loadPresupuestos(params);
+                    loadResumen(params);
+                    }}
                 />
               ))}
             </tbody>

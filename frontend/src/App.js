@@ -9,6 +9,7 @@ import AdminPage from './pages/AdminPage';
 import PrivateRoute from './components/PrivateRoute';
 import { AuthContext } from './context/AuthContext';
 import AdminRoute from './components/AdminRoute';
+import DetailBudgetPage from './pages/DetailBudgetPage';
 
 function App() {
   const { token,usuario, logout  } = useContext(AuthContext);
@@ -88,7 +89,11 @@ function App() {
             }
           />
 
-          {/* Ruta de administrador */}
+          <Route 
+            path="/presupuestos/:id" 
+            element={<DetailBudgetPage />} 
+          />
+
           <Route
             path="/admin"
             element={
