@@ -3,7 +3,7 @@ import { eliminarPresupuesto } from '../api/presupuestoApi';
 
 function BudgetItem({ presupuesto, onEliminar }) {
   const navigate = useNavigate();
-  const { _id, identifier, titulo, cliente, descripcion, monto, estado, fechaCreacion, archivo } = presupuesto;
+  const { _id, identifier, titulo, cliente, descripcion, importe, estado, fechaCreacion, archivo } = presupuesto;
   const fecha = new Date(fechaCreacion).toLocaleDateString('es-ES');
 
   // Función que se ejecuta al pulsar "Eliminar"
@@ -35,7 +35,7 @@ function BudgetItem({ presupuesto, onEliminar }) {
       </h3>
       <p><strong>Cliente:</strong> {cliente}</p>
       <p>{descripcion}</p>
-      <p><strong>Monto:</strong> € {monto.toFixed(2)}</p>
+      <p><strong>importe:</strong> € {importe.toFixed(2)}</p>
       <p><strong>Estado:</strong> {estado}</p>
       <p><small>Creado el: {fecha}</small></p>
 

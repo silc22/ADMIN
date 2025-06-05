@@ -47,11 +47,11 @@ module.exports = (upload) => {
         .optional()
         .isLength({ max: 500 })
         .withMessage('La descripción no puede superar 500 caracteres.'),
-      body('monto')
+      body('importe')
         .notEmpty()
-        .withMessage('El monto es obligatorio.')
+        .withMessage('El importe es obligatorio.')
         .isFloat({ min: 0 })
-        .withMessage('El monto debe ser un número mayor o igual a 0.'),
+        .withMessage('El importe debe ser un número mayor o igual a 0.'),
       body('estado')
         .notEmpty()
         .withMessage('El estado es obligatorio.')
@@ -95,11 +95,11 @@ module.exports = (upload) => {
         .optional()
         .isLength({ max: 500 })
         .withMessage('La descripción no puede superar 500 caracteres.'),
-      body('monto')
+      body('importe')
         .notEmpty()
-        .withMessage('El monto es obligatorio.')
+        .withMessage('El importe es obligatorio.')
         .isFloat({ min: 0 })
-        .withMessage('El monto debe ser un número mayor o igual a 0.'),
+        .withMessage('El importe debe ser un número mayor o igual a 0.'),
       body('estado')
         .notEmpty()
         .withMessage('El estado es obligatorio.')

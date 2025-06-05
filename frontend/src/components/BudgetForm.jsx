@@ -6,7 +6,7 @@ function BudgetForm({ onSubmit, isSubmitting, initialData = null }) {
   const [titulo, setTitulo] = useState('');
   const [cliente, setCliente] = useState('');
   const [descripcion, setDescripcion] = useState('');
-  const [monto, setMonto] = useState('');
+  const [importe, setimporte] = useState('');
   const [estado, setEstado] = useState('pendiente');
   const [file, setFile] = useState(null);
   const [removeFile, setRemoveFile] = useState(false);
@@ -15,7 +15,7 @@ function BudgetForm({ onSubmit, isSubmitting, initialData = null }) {
   titulo: '',
   cliente: '',
   descripcion: '',
-  monto: '',
+  importe: '',
   estado: '',
   archivo: ''
 });
@@ -26,7 +26,7 @@ function BudgetForm({ onSubmit, isSubmitting, initialData = null }) {
       setTitulo(initialData.titulo || '');
       setCliente(initialData.cliente || '');
       setDescripcion(initialData.descripcion || '');
-      setMonto(initialData.monto !== undefined ? initialData.monto : '');
+      setimporte(initialData.importe !== undefined ? initialData.importe : '');
       setEstado(initialData.estado || 'pendiente');
       setFile(null);
       setRemoveFile(false);
@@ -34,7 +34,7 @@ function BudgetForm({ onSubmit, isSubmitting, initialData = null }) {
         titulo: '',
         cliente: '',
         descripcion: '',
-        monto: '',
+        importe: '',
         estado: '',
         archivo: ''
       });
@@ -61,11 +61,11 @@ function BudgetForm({ onSubmit, isSubmitting, initialData = null }) {
       if (value.length > 500) return 'La descripción no puede superar 500 caracteres.';
       return '';
     },
-    monto: (value) => {
-      if (value === '' || value === null) return 'El monto es obligatorio.';
+    importe: (value) => {
+      if (value === '' || value === null) return 'El importe es obligatorio.';
       const num = Number(value);
-      if (isNaN(num)) return 'El monto debe ser un número válido.';
-      if (num < 0) return 'El monto no puede ser negativo.';
+      if (isNaN(num)) return 'El importe debe ser un número válido.';
+      if (num < 0) return 'El importe no puede ser negativo.';
       return '';
     },
     estado: (value) => {
@@ -115,12 +115,12 @@ function BudgetForm({ onSubmit, isSubmitting, initialData = null }) {
     }));
   };
 
-  const handleMontoChange = (e) => {
+  const handleimporteChange = (e) => {
     const value = e.target.value;
-    setMonto(value);
+    setimporte(value);
     setErrors((prev) => ({
       ...prev,
-      monto: validators.monto(value)
+      importe: validators.importe(value)
     }));
   };
 
@@ -161,7 +161,7 @@ function BudgetForm({ onSubmit, isSubmitting, initialData = null }) {
       titulo: validators.titulo(titulo),
       cliente: validators.cliente(cliente),
       descripcion: validators.descripcion(descripcion),
-      monto: validators.monto(monto),
+      importe: validators.importe(importe),
       estado: validators.estado(estado),
       archivo: validators.archivo(file)
     };
@@ -174,8 +174,8 @@ function BudgetForm({ onSubmit, isSubmitting, initialData = null }) {
       return;
     }
 
-    if (!cliente.trim() || monto === '' || monto < 0 ) {
-      alert('El título, el cliente y el monto (>=0) son obligatorios');
+    if (!cliente.trim() || importe === '' || importe < 0 ) {
+      alert('El título, el cliente y el importe (>=0) son obligatorios');
       return;
     }
      // Construir objeto a enviar
@@ -183,7 +183,7 @@ function BudgetForm({ onSubmit, isSubmitting, initialData = null }) {
       titulo: titulo || '',
       cliente,
       descripcion,
-      monto: Number(monto),
+      importe: Number(importe),
       estado,
       removeFile
     };
@@ -245,22 +245,22 @@ function BudgetForm({ onSubmit, isSubmitting, initialData = null }) {
         )}
       </div>
 
-      {/* MONTO */}
+      {/* importe */}
       <div>
-        <label className="block font-medium mb-1">Monto (€):</label>
+        <label className="block font-medium mb-1">importe (€):</label>
         <input
           type="number"
-          value={monto}
-          onChange={handleMontoChange}
+          value={importe}
+          onChange={handleimporteChange}
           className={`w-full border px-3 py-2 rounded ${
-            errors.monto ? 'border-red-500' : ''
+            errors.importe ? 'border-red-500' : ''
           }`}
           placeholder="0.00"
           min="0"
           step="0.01"
         />
-        {errors.monto && (
-          <p className="text-red-600 text-sm mt-1">{errors.monto}</p>
+        {errors.importe && (
+          <p className="text-red-600 text-sm mt-1">{errors.importe}</p>
         )}
       </div>
 

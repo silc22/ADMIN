@@ -20,7 +20,7 @@ export const crearPresupuesto = (data, file) => {
   formData.append('titulo', data.titulo);
   formData.append('cliente', data.cliente);
   formData.append('descripcion', data.descripcion);
-  formData.append('monto', data.monto);
+  formData.append('importe', data.importe);
   formData.append('estado', data.estado);
   if (file) {
     formData.append('archivo', file); // “archivo” coincide con upload.single('archivo')
@@ -35,7 +35,7 @@ export const actualizarPresupuesto = (id, data, file) => {
   formData.append('titulo', data.titulo);
   formData.append('cliente', data.cliente);
   formData.append('descripcion', data.descripcion);
-  formData.append('monto', data.monto);
+  formData.append('importe', data.importe);
   formData.append('estado', data.estado);
   if (file) {
     formData.append('archivo', file);

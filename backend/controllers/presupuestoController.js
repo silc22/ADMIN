@@ -84,8 +84,8 @@ exports.obtenerPresupuestoPorId = async (req, res) => {
 // Crear un nuevo presupuesto
 exports.crearPresupuesto = async (req, res) => {
   try {
-    // Campos del body (titúlo, cliente, descripción, monto, estado)
-    const { titulo, cliente, descripcion, monto, estado } = req.body;
+    // Campos del body (titúlo, cliente, descripción, importe, estado)
+    const { titulo, cliente, descripcion, importe, estado } = req.body;
 
     // Construir nuevo objeto Presupuesto
     const nuevoPresupuesto = new Presupuesto({
@@ -93,7 +93,7 @@ exports.crearPresupuesto = async (req, res) => {
       titulo: titulo || '',
       cliente,
       descripcion,
-      monto,
+      importe,
       estado
     });
 
@@ -127,7 +127,7 @@ exports.crearPresupuesto = async (req, res) => {
 exports.actualizarPresupuesto = async (req, res) => {
   try {
     const { id } = req.params;
-    const { titulo, cliente, descripcion, monto, estado, removeFile } = req.body;
+    const { titulo, cliente, descripcion, importe, estado, removeFile } = req.body;
 
     const presupuesto = await Presupuesto.findById(id);
     if (!presupuesto) {
@@ -172,7 +172,7 @@ exports.actualizarPresupuesto = async (req, res) => {
      if (typeof titulo !== 'undefined') presupuesto.titulo = titulo;
     presupuesto.cliente = cliente;
     presupuesto.descripcion = descripcion;
-    presupuesto.monto = Number(monto);
+    presupuesto.importe = Number(importe);
     presupuesto.estado = estado;
 
     const actualizado = await presupuesto.save();

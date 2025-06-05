@@ -37,10 +37,10 @@ const PresupuestoSchema = new mongoose.Schema({
     default: '',
     maxlength: [500, 'La descripción no puede superar 500 caracteres.']
   },
-  monto: {
+  importe: {
     type: Number,
-    required: [true, 'El campo monto es obligatorio.'],
-    min: [0, 'El monto no puede ser negativo.']
+    required: [true, 'El campo importe es obligatorio.'],
+    min: [0, 'El importe no puede ser negativo.']
   },
   estado: {
     type: String,
