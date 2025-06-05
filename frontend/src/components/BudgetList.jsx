@@ -184,7 +184,7 @@ function BudgetList() {
       {/* 9.1) Formulario de filtros con botón “Aplicar Filtros” */}
       <form
         onSubmit={handleBuscar}
-        className="mb-6 space-y-4 bg-white p-4 rounded shadow"
+        className="mb-6 space-y-4 p-4 rounded shadow"
       >
         <h3 className="text-lg font-semibold mb-2">Filtros de Presupuestos</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -304,14 +304,14 @@ function BudgetList() {
       </form>
 
       {/* 9.2) Panel de Resumen */}
-      <div className="mb-6 bg-white p-4 rounded shadow">
+      <div className="mb-6 p-4">
         <h3 className="text-lg font-semibold mb-2">Resumen por Estado</h3>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {resumen.map((r) => (
-            <div key={r.estado} className="bg-gray-50 p-3 rounded">
+            <div key={r.estado} className="p-3 rounded">
               <p className="text-sm font-medium capitalize">{r.estado}</p>
-              <p className="mt-1 text-lg font-bold">{r.count} presupuesto(s)</p>
-              <p className="text-gray-700">
+              <p className="mt-1 text-lg ">{r.count} presupuesto(s)</p>
+              <p className="">
                 Total importe:{' '}
                 <span className="font-semibold">
                   {r.totalImporte.toFixed(2)} €
@@ -332,14 +332,14 @@ function BudgetList() {
           <table className="w-full table-auto border-collapse">
             <thead>
               <tr className="bg-gray-200 text-gray-700">
-                <th className="border px-4 py-2 text-left max-w-1">ID</th>
+                <th className="border px-4 py-2 text-left">ID</th>
                 <th className="border px-4 py-2 text-left">Titulo</th>
                 <th className="border px-4 py-2 text-left">Cliente</th>
                 <th className="border px-4 py-2 text-left">Descripción</th>
-                <th className="border px-4 py-2 text-left">Archivo</th>
-                <th className="border px-4 py-2 text-right">Importe (€)</th>
-                <th className="border px-4 py-2 text-left">Estado</th>
-                <th className="border px-4 py-2 text-left">F. de Creación</th>
+                <th className="border px-4 py-2 text-center">Archivo</th>
+                <th className="border px-4 py-2 text-center">Importe (€)</th>
+                <th className="border px-4 py-2 text-center">Estado</th>
+                <th className="border px-4 py-2 text-center">F. de Creación</th>
                 <th className="border px-4 py-2 text-center">Acciones</th>
               </tr>
             </thead>

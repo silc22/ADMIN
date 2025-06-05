@@ -41,50 +41,50 @@ function BudgetItem({ presupuesto, onEliminar }) {
   return (
     <tr className="hover:bg-gray-200">
       {/* 1. Número de Presupuesto */}
-      <td className="border px-4 py-2 text-white">
+      <td className="border px-4 py-2 ">
         {identifier} 
       </td>
 
-      <td className="border px-4 py-2 text-white">
+      <td className="border px-4 py-2">
         {titulo ? `${titulo}` : ''}
       </td>
 
       {/* 2. Cliente */}
-      <td className="border px-4 py-2 text-white ">
+      <td className="border px-4 py-2">
         {cliente}
       </td>
 
       {/* 3. Descripción */}
-      <td className="border px-4 py-2 text-white ">
+      <td className="border px-4 py-2">
         {textoCorto}
       </td>
 
       {/* 4. Archivo */}
-      <td className="border px-4 py-2 text-white">
+      <td className="border px-4 py-2 text-center">
         {archivo && archivo.url ? (
           <a
             href={`${baseURL}${archivo.url}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-blue-600 underline text-sm"
+            className="text-gray-100 underline text-sm"
           >
             {archivo.originalName || 'Ver archivo'}
           </a>
         ) : (
-          <span className="text-gray-500 text-sm">Sin archivo</span>
+          <span className="text-gray-300 text-sm">Sin archivo</span>
         )}
       </td>
 
       {/* 5. Importe */}
-      <td className="border px-4 py-2 text-right">
+      <td className="border px-4 py-2 text-center">
         {importe.toFixed(2)}
       </td>
 
       {/* 6. Estado */}
-      <td className="border px-4 py-2">
+      <td className="border  px-2 py-2 text-center">
         <span
           className={`
-            px-2 py-1 rounded-full text-sm font-semibold
+            px-1 py-1 rounded-md text-sm font-semibold flex
             ${estado === 'pendiente' ? 'bg-yellow-200 text-yellow-800' : ''}
             ${estado === 'aprobado' ? 'bg-green-200 text-green-800' : ''}
             ${estado === 'rechazado' ? 'bg-red-200 text-red-800' : ''}
@@ -95,7 +95,7 @@ function BudgetItem({ presupuesto, onEliminar }) {
       </td>
 
       {/* 7. F. de Creación */}
-      <td className="border px-4 py-2">{fecha}</td>
+      <td className="border px-4 py-2 text-center">{fecha}</td>
 
       {/* 8. Acciones (Editar / Eliminar) */}
       <td className="border px-4 py-2 text-center space-x-2">
@@ -107,7 +107,7 @@ function BudgetItem({ presupuesto, onEliminar }) {
         </button>
         <button 
           onClick={handleDetalle} 
-          className="px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600"
+          className="px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600 text-sm"
         >
           Detalle
         </button>

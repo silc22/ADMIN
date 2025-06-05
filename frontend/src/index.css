@@ -2,4 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Aquí podrías añadir tus clases personalizadas si las necesitas */
+/* =====> Capa base para definir el bg por defecto <===== */
+@layer base {
+  body {
+    /* Fondo gris claro por defecto */
+    @apply bg-gray-100 dark:bg-gray-800 dark:text-white;
+  }
+}
