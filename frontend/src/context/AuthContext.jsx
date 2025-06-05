@@ -19,7 +19,6 @@ export const AuthProvider = ({ children }) => {
               headers: { Authorization: `Bearer ${token}` }
             }
           );
-          setUsuario(res.data.usuario);
           setUsuario({ ...res.data.usuario, role: res.data.usuario.role });
         } catch (err) {
           console.error('Token inválido o expirado', err);

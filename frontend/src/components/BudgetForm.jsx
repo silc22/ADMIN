@@ -7,7 +7,7 @@ function BudgetForm({ onSubmit, isSubmitting, initialData = null }) {
   const [titulo, setTitulo] = useState('');
   const [cliente, setCliente] = useState('');
   const [descripcion, setDescripcion] = useState('');
-  const [importe, setimporte] = useState('');
+  const [importe, setImporte] = useState('');
   const [estado, setEstado] = useState('pendiente');
   const [file, setFile] = useState(null);
   const [removeFile, setRemoveFile] = useState(false);
@@ -27,7 +27,7 @@ function BudgetForm({ onSubmit, isSubmitting, initialData = null }) {
       setTitulo(initialData.titulo || '');
       setCliente(initialData.cliente || '');
       setDescripcion(initialData.descripcion || '');
-      setimporte(initialData.importe !== undefined ? initialData.importe : '');
+      setImporte(initialData.importe !== undefined ? initialData.importe : '');
       setEstado(initialData.estado || 'pendiente');
       setFile(null);
       setRemoveFile(false);
@@ -116,9 +116,9 @@ function BudgetForm({ onSubmit, isSubmitting, initialData = null }) {
     }));
   };
 
-  const handleimporteChange = (e) => {
+  const handleImporteChange = (e) => {
     const value = e.target.value;
-    setimporte(value);
+    setImporte(value);
     setErrors((prev) => ({
       ...prev,
       importe: validators.importe(value)
@@ -252,7 +252,7 @@ function BudgetForm({ onSubmit, isSubmitting, initialData = null }) {
         <input
           type="number"
           value={importe}
-          onChange={handleimporteChange}
+          onChange={handleImporteChange }
           className={`w-full border px-3 py-2 rounded ${
             errors.importe ? 'border-red-500' : ''
           }`}
