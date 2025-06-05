@@ -9,30 +9,68 @@ exports.obtenerPresupuestos = async (req, res) => {
     const { q, page = 1, limit = 10 } = req.query;
     const pageNum = parseInt(page, 10) < 1 ? 1 : parseInt(page, 10);
     const limitNum = parseInt(limit, 10) < 1 ? 10 : parseInt(limit, 10);
+     
+    // 2) Leer parámetros de filtrado adicionales
+    const {
+      estado,
+      cliente,
+      minImporte,
+      maxImporte,
+      fechaDesde,
+      fechaHasta
+    } = req.query;
+
 
     let filtro = {};
 
     if (q && q.trim() !== '') {
       const texto = q.trim();
       const regexp = new RegExp(texto, 'i');
+      filtro.$or = [{ titulo: regexp }, { descripcion: regexp }];
+    }
+      
+    // 4) Filtrar por “estado”
+    if (estado && ['pendiente', 'aprobado', 'rechazado'].includes(estado)) {
+      filtro.estado = estado;
+    }
 
-      // Intentar parsear texto a entero para "identifier"
-      const qInt = parseInt(texto, 10);
-      const buscarPorIdentifier = !isNaN(qInt);
+    // 5) Filtrar por “cliente” (búsqueda parcial, case-insensitive)
+    if (cliente && cliente.trim() !== '') {
+      const clienteRegex = new RegExp(cliente.trim(), 'i');
+      filtro.cliente = clienteRegex;
+    }
 
-      // Armar el array de condiciones para $or
-      const condiciones = [
-        { titulo: regexp },
-        { cliente: regexp },
-        { descripcion: regexp },
-        { estado: regexp }
-      ];
-
-      if (buscarPorIdentifier) {
-        condiciones.push({ identifier: qInt });
+    
+    // 6) Filtrar por rango de importe
+    if (minImporte !== undefined || maxImporte !== undefined) {
+      filtro.importe = {};
+      if (minImporte !== undefined && !isNaN(parseFloat(minImporte))) {
+        filtro.importe.$gte = parseFloat(minImporte);
       }
+      if (maxImporte !== undefined && !isNaN(parseFloat(maxImporte))) {
+        filtro.importe.$lte = parseFloat(maxImporte);
+      }
+      // Si está vacío (por no cumplirse las condiciones), lo eliminamos
+      if (Object.keys(filtro.importe).length === 0) {
+        delete filtro.importe;
+      }
+    }
 
-      filtro = { $or: condiciones };
+    // 7) Filtrar por rango de fecha de creación
+    if ((fechaDesde && !isNaN(new Date(fechaDesde))) || (fechaHasta && !isNaN(new Date(fechaHasta)))) {
+      filtro.fechaCreacion = {};
+      if (fechaDesde && !isNaN(new Date(fechaDesde))) {
+        filtro.fechaCreacion.$gte = new Date(fechaDesde);
+      }
+      if (fechaHasta && !isNaN(new Date(fechaHasta))) {
+        // Para incluir todo el día “fechaHasta”, ponemos 23:59:59
+        const hasta = new Date(fechaHasta);
+        hasta.setHours(23, 59, 59, 999);
+        filtro.fechaCreacion.$lte = hasta;
+      }
+      if (Object.keys(filtro.fechaCreacion).length === 0) {
+        delete filtro.fechaCreacion;
+      }
     }
 
      // Contar total de documentos que coinciden
@@ -242,5 +280,82 @@ exports.eliminarPresupuesto = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ mensaje: 'Error al eliminar presupuesto' });
+  }
+};
+
+exports.getResumenPresupuestos = async (req, res) => {
+  try {
+    // 1) Reconstruimos el mismo filtro que en obtenerPresupuestos:
+    const { q, estado, cliente, minImporte, maxImporte, fechaDesde, fechaHasta } = req.query;
+    let filtro = {};
+    if (q && q.trim() !== '') {
+      const texto = q.trim();
+      const regexp = new RegExp(texto, 'i');
+      filtro.$or = [{ titulo: regexp }, { descripcion: regexp }];
+    }
+    if (estado && ['pendiente', 'aprobado', 'rechazado'].includes(estado)) {
+      filtro.estado = estado;
+    }
+    if (cliente && cliente.trim() !== '') {
+      filtro.cliente = new RegExp(cliente.trim(), 'i');
+    }
+    if (minImporte !== undefined || maxImporte !== undefined) {
+      filtro.importe = {};
+      if (minImporte !== undefined && !isNaN(parseFloat(minImporte))) {
+        filtro.importe.$gte = parseFloat(minImporte);
+      }
+      if (maxImporte !== undefined && !isNaN(parseFloat(maxImporte))) {
+        filtro.importe.$lte = parseFloat(maxImporte);
+      }
+      if (Object.keys(filtro.importe).length === 0) delete filtro.importe;
+    }
+    if ((fechaDesde && !isNaN(new Date(fechaDesde))) || (fechaHasta && !isNaN(new Date(fechaHasta)))) {
+      filtro.fechaCreacion = {};
+      if (fechaDesde && !isNaN(new Date(fechaDesde))) {
+        filtro.fechaCreacion.$gte = new Date(fechaDesde);
+      }
+      if (fechaHasta && !isNaN(new Date(fechaHasta))) {
+        const hasta = new Date(fechaHasta);
+        hasta.setHours(23, 59, 59, 999);
+        filtro.fechaCreacion.$lte = hasta;
+      }
+      if (Object.keys(filtro.fechaCreacion).length === 0) delete filtro.fechaCreacion;
+    }
+
+    // 2) Usar agregación de Mongo para agrupar por estado:
+    const pipeline = [
+      { $match: filtro },
+      {
+        $group: {
+          _id: '$estado',
+          count: { $sum: 1 },
+          totalImporte: { $sum: '$importe' }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          estado: '$_id',
+          count: 1,
+          totalImporte: 1
+        }
+      }
+    ];
+
+    const resumen = await Presupuesto.aggregate(pipeline);
+
+    // 3) Asegurarnos de que todos los estados aparezcan (incluso con 0)
+    const estadosPosibles = ['pendiente', 'aprobado', 'rechazado'];
+    const resumenCompleto = estadosPosibles.map((e) => {
+      const encontrado = resumen.find((r) => r.estado === e);
+      return encontrado
+        ? encontrado
+        : { estado: e, count: 0, totalImporte: 0 };
+    });
+
+    return res.json({ summary: resumenCompleto });
+  } catch (error) {
+    console.error('Error en getResumenPresupuestos:', error);
+    return res.status(500).json({ mensaje: 'Error al obtener resumen' });
   }
 };

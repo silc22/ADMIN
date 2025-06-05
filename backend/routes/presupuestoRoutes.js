@@ -2,6 +2,7 @@ const express = require('express');
 const { body, param, validationResult } = require('express-validator');
 const router = express.Router();
 const authMiddleware = require('../middleware/authMiddleware');
+const requireAdmin = require('../middleware/roleMiddleware')('admin');
 
 module.exports = (upload) => {
   // Importamos las funciones del controlador
@@ -10,8 +11,14 @@ module.exports = (upload) => {
     obtenerPresupuestoPorId,
     crearPresupuesto,
     actualizarPresupuesto,
-    eliminarPresupuesto
+    eliminarPresupuesto,
+    getResumenPresupuestos
   } = require('../controllers/presupuestoController');
+
+  // 1) Nueva ruta: GET /api/presupuestos/summary
+  //    Protegida o no, según necesites. Por ejemplo, si solo quieres mostrarla a admins, 
+  //    agrega authMiddleware y requireAdmin. Si todos pueden verla, déjala pública.
+  router.get('/summary', authMiddleware, requireAdmin, getResumenPresupuestos);
 
   // GET /api/presupuestos        ⇒ Listar todos (sin adjunto)
   router.get('/', obtenerPresupuestos);

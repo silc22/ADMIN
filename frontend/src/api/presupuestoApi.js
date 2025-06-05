@@ -1,5 +1,6 @@
 import apiClient from './axiosConfig';
 
+
 export const getPresupuestos = ({ q = '', page = 1, limit = 10 } = {}) => {
   const params = {};
   if (q && q.trim() !== '') {
@@ -8,6 +9,10 @@ export const getPresupuestos = ({ q = '', page = 1, limit = 10 } = {}) => {
   params.page = page;
   params.limit = limit;
    return apiClient.get('/presupuestos', { params });
+};
+
+export const getResumenPresupuestos = (params) => {
+  return apiClient.get('/presupuestos/summary', { params });
 };
 
 export const getPresupuestoPorId = (id) => {
