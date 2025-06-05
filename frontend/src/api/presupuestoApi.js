@@ -1,14 +1,43 @@
 import apiClient from './axiosConfig';
 
 
-export const getPresupuestos = ({ q = '', page = 1, limit = 10 } = {}) => {
+export const getPresupuestos = ({
+  q = '',
+  page = 1,
+  limit = 10,
+  estado,
+  cliente,
+  minImporte,
+  maxImporte,
+  fechaDesde,
+  fechaHasta
+} = {}) => {
   const params = {};
   if (q && q.trim() !== '') {
     params.q = q.trim();
   }
+  if (estado && estado.trim() !== '') {
+    params.estado = estado.trim();
+  }
+  if (cliente && cliente.trim() !== '') {
+    params.cliente = cliente.trim();
+  }
+  if (minImporte !== undefined && minImporte !== null && minImporte !== '') {
+    params.minImporte = minImporte;
+  }
+  if (maxImporte !== undefined && maxImporte !== null && maxImporte !== '') {
+    params.maxImporte = maxImporte;
+  }
+  if (fechaDesde && fechaDesde.trim() !== '') {
+    params.fechaDesde = fechaDesde.trim();
+  }
+  if (fechaHasta && fechaHasta.trim() !== '') {
+    params.fechaHasta = fechaHasta.trim();
+  }
   params.page = page;
   params.limit = limit;
-   return apiClient.get('/presupuestos', { params });
+   
+  return apiClient.get('/presupuestos', { params });
 };
 
 export const getResumenPresupuestos = (params) => {
