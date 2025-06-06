@@ -74,7 +74,12 @@ export default function DetailBudgetPage() {
 
         <p>
           <span className="font-medium">Importe: </span>
-          <span>€ {presupuesto.importe.toFixed(2)}</span>
+          <span>
+            € {presupuesto.importe.toLocaleString('es-ES', {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2
+            })}
+          </span>
         </p>
 
         <p>

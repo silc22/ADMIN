@@ -68,7 +68,10 @@ function BudgetItem({ presupuesto, onEliminar }) {
 
       {/* 5. Importe */}
       <td className="truncate border px-4 py-2 text-center">
-        {importe.toFixed(2)}
+        {importe.toLocaleString('es-ES', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        })}
       </td>
 
       {/* 6. Estado */}
