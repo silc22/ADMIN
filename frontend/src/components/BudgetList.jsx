@@ -202,7 +202,7 @@ function BudgetList() {
   // 9) Renderizado
   // ---------------------------------------
   return (
-    <div >
+    <div className='mt-44 md:m-0'>
       {/* 9.1) Formulario de filtros con botón “Aplicar Filtros” */}
       <form
         onSubmit={handleBuscar}
@@ -372,7 +372,7 @@ function BudgetList() {
       {/* 9.4) Tabla de Presupuestos */}
       {!cargando && presupuestos.length > 0 && (
         <div className="overflow-x-auto">
-          <table className="w-full table-fixed border-collapse">
+          <table className="min-w-full table-auto md:table-fixed border-collapse text-sm md:text-base">
             <thead>
               <tr className="bg-gray-200 text-gray-700">
                 <th className="w-16 border px-4 py-2 text-left">ID</th>

@@ -192,7 +192,7 @@ function BudgetForm({ onSubmit, isSubmitting, initialData = null }) {
   };
 
    return (
-    <form onSubmit={manejarSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+    <form onSubmit={manejarSubmit} className="flex flex-col gap-4">
       
       {/* TITULO */}
       <div>
@@ -324,20 +324,21 @@ function BudgetForm({ onSubmit, isSubmitting, initialData = null }) {
       </div>
 
       {/* BOTÓN SUBMIT */}
-      <button
-        type="submit"
-        disabled={isSubmitting}
-        className="mt-4 px-4 py-2 bg-green-500 hover:bg-green-700 text-white rounded-md"
-      >
-        {isSubmitting ? 'Guardando…' : 'Guardar Presupuesto'}
-      </button>
-      <button className="mt-4 px-4 py-2 bg-gray-500 hover:bg-gray-700 text-white rounded-md">
+       <div className="mt-4 flex flex-col sm:flex-row gap-2">
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="px-4 py-2 bg-green-500 hover:bg-green-700 text-white rounded-md"
+        >
+          {isSubmitting ? 'Guardando…' : 'Guardar Presupuesto'}
+        </button>
         <Link 
           to="/presupuestos"
+          className="px-4 py-2 bg-gray-500 hover:bg-gray-700 text-white rounded-md text-center"
         >
           ← Volver
         </Link>
-      </button>
+       </div>
       
 
     </form>
