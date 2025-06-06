@@ -51,8 +51,8 @@ function EditBudgetPage() {
   }
 
   return (
-    <div style={{ maxWidth: '600px', margin: '2rem auto' }}>
-      <h2>Editar Presupuesto</h2>
+    <div className="max-w-lg mx-auto p-4 mt-48 md:mt-20">
+      <h2 className="text-2xl font-bold mb-4">Editar Presupuesto</h2>
       {/* Pasamos initialData a BudgetForm para que pré-llene los campos */}
       {initialData ? (
         <BudgetForm

@@ -27,7 +27,7 @@ function NewBudgetPage() {
   };
 
   return (
-    <div className="max-w-lg mx-auto p-4 mt-48  md:mt-20">
+    <div className="max-w-lg mx-auto p-4 mt-48 md:mt-20">
       <h2 className="text-2xl font-bold mb-4">Nuevo Presupuesto</h2>
 
       {/* Mostrar errores de backend */}
