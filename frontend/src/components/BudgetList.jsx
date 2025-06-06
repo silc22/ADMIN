@@ -368,7 +368,7 @@ function BudgetList() {
           <table className="w-full table-fixed border-collapse">
             <thead>
               <tr className="bg-gray-200 text-gray-700">
-                <th className="w-14 border px-4 py-2 text-left">ID</th>
+                <th className="w-16 border px-4 py-2 text-left">ID</th>
                 <th className="border px-4 py-2 text-left">Titulo</th>
                 <th className="border px-4 py-2 text-left">Cliente</th>
                 <th className="border px-4 py-2 text-left">Descripción</th>
