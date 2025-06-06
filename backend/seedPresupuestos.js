@@ -1,10 +1,11 @@
 /**
  * seedPresupuestos.js
  *
- * Inserta 100 documentos de ejemplo en la colección "presupuestos".
- * 
+ * Inserta 100 documentos de ejemplo en la colección "presupuestos", 
+ * todos con owner="6840c40b4fe8c91c1f1a9437".
+ *
  * Para usarlo:
- *   1) Asegúrate de tener .env con MONGODB_URI.
+ *   1) Asegúrate de tener .env con MONGODB_URI correcto.
  *   2) Ejecuta: node seedPresupuestos.js
  */
 
@@ -82,10 +83,8 @@ async function conectarMongo() {
   console.log('🔌 Conectado a MongoDB');
 }
 
-// -------------- 3) Generar un ObjectId aleatorio ---------------
-function randomOwnerId() {
-  return new mongoose.Types.ObjectId();
-}
+// -------------- 3) `owner` fijo para todos ---------------
+const OWNER_ID = new mongoose.Types.ObjectId('6840c40b4fe8c91c1f1a9437');
 
 // -------------- 4) Generar un presupuesto aleatorio ---------------
 function crearPresupuestoDeEjemplo(numero) {
@@ -117,7 +116,7 @@ function crearPresupuestoDeEjemplo(numero) {
   const archivo = undefined;
 
   return {
-    owner: randomOwnerId(),
+    owner: OWNER_ID,
     identifier: numero,
     titulo,
     cliente,
@@ -155,3 +154,4 @@ async function seed() {
 if (require.main === module) {
   seed();
 }
+
