@@ -6,6 +6,6 @@
 @layer base {
   body {
     /* Fondo gris claro por defecto */
-    @apply bg-gray-100 dark:bg-gray-800 dark:text-white;
+    @apply bg-gray-100 dark:bg-gray-800 dark:text-white flex flex-col;
   }
 }

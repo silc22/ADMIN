@@ -180,11 +180,11 @@ function BudgetList() {
   // 9) Renderizado
   // ---------------------------------------
   return (
-    <div>
+    <div >
       {/* 9.1) Formulario de filtros con botón “Aplicar Filtros” */}
       <form
         onSubmit={handleBuscar}
-        className="mb-6 space-y-4 p-4 rounded shadow"
+        className="mb-6 space-y-4 p-4 "
       >
         <h3 className="text-lg font-semibold mb-2">Filtros de Presupuestos</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -304,7 +304,7 @@ function BudgetList() {
       </form>
 
       {/* 9.2) Panel de Resumen */}
-      <div className="mb-6 p-4">
+      <div className="mb-6 p-4 ">
         <h3 className="text-lg font-semibold mb-2">Resumen por Estado</h3>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {resumen.map((r) => (

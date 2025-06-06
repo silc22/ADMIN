@@ -17,7 +17,7 @@ function App() {
 
  return (
     <Router>
-      <nav className="bg-gray-100 p-4 flex justify-between items-center">
+      <nav className="border-b-2 border-gray-600 p-4 flex justify-between items-center">
         <Link to="/" className="font-bold text-xl">Presupuestos</Link>
         <div className="flex items-center space-x-4">
           {token ? (

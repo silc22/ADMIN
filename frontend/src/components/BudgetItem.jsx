@@ -33,13 +33,13 @@ function BudgetItem({ presupuesto, onEliminar }) {
   const baseURL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
   const textoCorto = descripcion
-  ? (descripcion.length > 30
-      ? descripcion.slice(0, 30) + '...'
+  ? (descripcion.length > 50
+      ? descripcion.slice(0, 50) + ' + '
       : descripcion)
   : '';
 
   return (
-    <tr className="hover:bg-gray-200">
+    <tr className="hover:bg-gray-600 border">
       {/* 1. Número de Presupuesto */}
       <td className="border px-4 py-2 ">
         {identifier} 
@@ -84,7 +84,7 @@ function BudgetItem({ presupuesto, onEliminar }) {
       <td className="border  px-2 py-2 text-center">
         <span
           className={`
-            px-1 py-1 rounded-md text-sm font-semibold flex
+            px-1 py-1 rounded-md text-sm font-semibold flex flex-col
             ${estado === 'pendiente' ? 'bg-yellow-200 text-yellow-800' : ''}
             ${estado === 'aprobado' ? 'bg-green-200 text-green-800' : ''}
             ${estado === 'rechazado' ? 'bg-red-200 text-red-800' : ''}
