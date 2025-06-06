@@ -6,6 +6,10 @@ module.exports = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        // Definimos la familia "anton" apuntando a la fuente Anton importada
+        anton: ['Anton', 'sans-serif']
+      },
       // Aquí iremos luego a añadir tu paleta de colores
       colors: {
         // Colores base
