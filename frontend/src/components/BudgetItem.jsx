@@ -66,22 +66,6 @@ function BudgetItem({ presupuesto, onEliminar }) {
         {textoCorto}
       </td>
 
-      {/* 4. Archivo */}
-      {/* <td className="truncate border px-4 py-2 text-center">
-        {archivo && archivo.url ? (
-          <a
-            href={`${baseURL}${archivo.url}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-gray-100 underline text-sm"
-          >
-            {archivo.originalName || 'Ver archivo'}
-          </a>
-        ) : (
-          <span className="text-gray-300 text-sm">Sin archivo</span>
-        )}
-      </td> */}
-
       {/* 5. Importe */}
       <td className="truncate border px-4 py-2 text-center">
         {importe.toFixed(2)}

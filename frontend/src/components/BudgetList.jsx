@@ -325,17 +325,24 @@ function BudgetList() {
       </form>
 
       {/* 9.2) Panel de Resumen */}
-      <div className="mb-6 p-4 ">
+      <div className="mb-6 p-4 rounded dark:bg-gray-600">
         <h3 className="text-lg font-semibold mb-2">Resumen por Estado</h3>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {resumen.map((r) => (
             <div key={r.estado} className="p-3 rounded">
-              <p className="text-sm font-medium capitalize">{r.estado}</p>
-              <p className="mt-1 text-lg ">{r.count} presupuesto(s)</p>
+              <p className={`
+            font-semibold font-medium capitalize text-lg
+            ${r.estado === 'pendiente' ? 'text-yellow-200' : ''}
+            ${r.estado === 'aprobado' ? 'text-green-200' : ''}
+            ${r.estado === 'rechazado' ? 'text-red-200' : ''}
+              `}>{r.estado}</p>
+              <p className="mt-1 text-sm ">{r.count} presupuesto(s)</p>
               <p className="">
                 Total importe:{' '}
                 <span className="font-semibold">
-                  {r.totalImporte.toFixed(2)} €
+                 € {r.totalImporte.toLocaleString('es-ES', {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2})}
                 </span>
               </p>
             </div>
