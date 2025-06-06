@@ -42,6 +42,15 @@ npm run dev
 
 This starts the API with `nodemon` and the React app simultaneously.
 
+## Scripts
+
+All `package.json` files provide `test` and `lint` commands.
+
+- `npm test` – prints "No tests" for now.
+- `npm run lint` – runs ESLint (the frontend uses `react-scripts lint`).
+
+Run these in the project root, or within `backend` and `frontend` depending on what you want to check.
+
 ## Project structure
 
 - **backend** – Express server, routes and models for the API. Handles file uploads in the `uploads` folder.
