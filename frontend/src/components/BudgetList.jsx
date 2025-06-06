@@ -24,7 +24,7 @@ function BudgetList() {
   // 2) Paginación
   // ---------------------------------------
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
 
   // ---------------------------------------
@@ -90,7 +90,7 @@ function BudgetList() {
     loadPresupuestos(paramsParaPage);
     loadResumen(paramsParaPage);
     // eslint-disable-next-line 
-  }, [currentPage]);
+  }, [currentPage, itemsPerPage, lastParams, loadPresupuestos, loadResumen]);
 
   // ---------------------------------------
   // 7) handleBuscar: al pulsar “Aplicar Filtros”
@@ -126,6 +126,7 @@ function BudgetList() {
       // 7.2) Guardo esos parámetros como “lastParams” y me aseguro de página 1
       setLastParams(newParams);
       setCurrentPage(1);
+
     } catch (err) {
       console.error('Error al aplicar filtros:', err);
       setError('Error al cargar presupuestos con filtros');
@@ -141,6 +142,7 @@ function BudgetList() {
   // 8) handleLimpiar: reset de filtros y recarga sin filtro
   // ---------------------------------------
   const handleLimpiar = () => {
+    
     setSearchTerm('');
     setEstadoFilter('');
     setClienteFilter('');
@@ -168,6 +170,23 @@ function BudgetList() {
     // serán invocados por el useEffect de currentPage = 1
   };
 
+// 10) Cambiar “items por página”
+  const handleItemsPerPageChange = (e) => {
+    const nuevo = parseInt(e.target.value, 10);
+    setItemsPerPage(nuevo);
+    // Reiniciar a página 1 al cambiar tamaño
+    setCurrentPage(1);
+    // Actualizar lastParams con el nuevo limit
+    setLastParams((prev) => ({ ...prev, limit: nuevo, page: 1 }));
+  };
+
+   // 11) Funciones de paginación: ir a página específica
+  const goToPage = (num) => {
+    if (num >= 1 && num <= totalPages) {
+      setCurrentPage(num);
+    }
+  };
+
   const goToPrevPage = () => {
     if (currentPage > 1) setCurrentPage((p) => p - 1);
   };
@@ -175,6 +194,9 @@ function BudgetList() {
   const goToNextPage = () => {
     if (currentPage < totalPages) setCurrentPage((p) => p + 1);
   };
+
+  // 12) Generar array de páginas [1, 2, 3, ..., totalPages]
+  const pagesArray = Array.from({ length: totalPages }, (_, i) => i + 1);
 
   // ---------------------------------------
   // 9) Renderizado
@@ -288,17 +310,16 @@ function BudgetList() {
         <div className="mt-4 flex items-center gap-2">
           <button
             type="submit"
-            disabled={cargando}
             className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50"
           >
-            {cargando ? 'Aplicando filtros…' : 'Aplicar Filtros'}
+            Aplicar
           </button>
           <button
             type="button"
             onClick={handleLimpiar}
             className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
           >
-            Limpiar Filtros
+            Limpiar
           </button>
         </div>
       </form>
@@ -320,6 +341,21 @@ function BudgetList() {
             </div>
           ))}
         </div>
+      </div>
+
+      {/* ===== 13.3) Selector “ítems por página” ===== */}
+      <div className="mb-4 flex items-center gap-2">
+               <select
+          id="perPageSelect"
+          value={itemsPerPage}
+          onChange={handleItemsPerPageChange}
+          className="border rounded px-2 py-1"
+        >
+          <option value={5}>5</option>
+          <option value={10}>10</option>
+          <option value={20}>20</option>
+          <option value={50}>50</option>
+        </select>
       </div>
 
       {/* 9.3) Mensajes de carga / error */}
@@ -370,36 +406,56 @@ function BudgetList() {
         </p>
       )}
 
-      {/* 9.6) Paginación */}
+      {/* ===== 13.7) Controles de paginación dinámicos ===== */}
       {!cargando && presupuestos.length > 0 && (
-        <div className="mt-6 flex justify-center items-center space-x-4">
-          <button
-            onClick={goToPrevPage}
-            disabled={currentPage === 1}
-            className={`px-3 py-1 rounded ${
-              currentPage === 1
-                ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
-                : 'bg-btn-primary text-white hover:bg-btn-primary/90'
-            }`}
-          >
-            Anterior
-          </button>
+        <div className="mt-6 flex flex-col items-center space-y-2">
+          {/* Botones “Anterior” / “Siguiente” */}
+          <div className="flex items-center space-x-4">
+            <button
+              onClick={goToPrevPage}
+              disabled={currentPage === 1}
+              className={`px-3 py-1 rounded ${
+                currentPage === 1
+                  ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
+                  : 'bg-btn-primary text-white hover:bg-btn-primary/90'
+              }`}
+            >
+              Anterior
+            </button>
 
-          <span className="text-gray-300">
-            Página {currentPage} de {totalPages}
-          </span>
+            <span className="text-gray-700">
+              Página {currentPage} de {totalPages}
+            </span>
 
-          <button
-            onClick={goToNextPage}
-            disabled={currentPage === totalPages}
-            className={`px-3 py-1 rounded ${
-              currentPage === totalPages
-                ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
-                : 'bg-btn-primary text-white hover:bg-btn-primary/90'
-            }`}
-          >
-            Siguiente
-          </button>
+            <button
+              onClick={goToNextPage}
+              disabled={currentPage === totalPages}
+              className={`px-3 py-1 rounded ${
+                currentPage === totalPages
+                  ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
+                  : 'bg-btn-primary text-white hover:bg-btn-primary/90'
+              }`}
+            >
+              Siguiente
+            </button>
+          </div>
+
+          {/* Botones numerados de paginación */}
+          <nav className="flex space-x-2">
+            {pagesArray.map((num) => (
+              <button
+                key={num}
+                onClick={() => goToPage(num)}
+                className={`px-3 py-1 rounded ${
+                  num === currentPage
+                    ? 'bg-btn-primary text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                {num}
+              </button>
+            ))}
+          </nav>
         </div>
       )}
     </div>
