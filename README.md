@@ -32,6 +32,15 @@ JWT_EXPIRES_IN=1d
 PORT=5000
 ```
 
+For the React frontend you can optionally create a `.env` file inside `frontend`.
+Define the `REACT_APP_API_URL` variable pointing to your backend server. This is
+used by Axios and various components to build API requests and links.
+
+```bash
+# Example: backend running locally on port 5000
+REACT_APP_API_URL=http://localhost:5000/api
+```
+
 ## Running in development
 
 From the project root run:
