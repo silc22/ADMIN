@@ -1,11 +1,27 @@
 import { useNavigate } from 'react-router-dom';
 import { eliminarPresupuesto } from '../api/presupuestoApi';
-import { Eye, Edit3, Trash2 } from 'lucide-react';
+import { Eye, Edit3, Trash2, DownloadCloud } from 'lucide-react';
 
 function BudgetItem({ presupuesto, onEliminar }) {
   const navigate = useNavigate();
   const { _id, identifier, titulo, cliente, descripcion, importe, estado, fechaCreacion, archivo } = presupuesto;
   const fecha = new Date(fechaCreacion).toLocaleDateString('es-ES');
+
+  // Navegar a página de detalle
+  const handleDetalle = () => {
+    navigate(`/presupuestos/${_id}`);
+  };
+ 
+  // Función para ir a la página de edición
+  const handleEditar = () => {
+    navigate(`/presupuestos/editar/${_id}`);
+  };
+
+   const handleDownload = () => {
+    if (archivo && archivo.url) {
+      window.open(`${baseURL}${archivo.url}`, '_blank');
+    }
+  };
 
   // Función que se ejecuta al pulsar "Eliminar"
    const handleEliminar = async () => {
@@ -18,16 +34,6 @@ function BudgetItem({ presupuesto, onEliminar }) {
       console.error(error);
       alert('Hubo un error al eliminar el presupuesto');
     }
-  };
-
-  // Función para ir a la página de edición
-  const handleEditar = () => {
-    navigate(`/presupuestos/editar/${_id}`);
-  };
-
-  // Navegar a página de detalle
-  const handleDetalle = () => {
-    navigate(`/presupuestos/${_id}`);
   };
 
   // Construir base de la URL (o usar env var)
@@ -61,7 +67,7 @@ function BudgetItem({ presupuesto, onEliminar }) {
       </td>
 
       {/* 4. Archivo */}
-      <td className="truncate border px-4 py-2 text-center">
+      {/* <td className="truncate border px-4 py-2 text-center">
         {archivo && archivo.url ? (
           <a
             href={`${baseURL}${archivo.url}`}
@@ -74,7 +80,7 @@ function BudgetItem({ presupuesto, onEliminar }) {
         ) : (
           <span className="text-gray-300 text-sm">Sin archivo</span>
         )}
-      </td>
+      </td> */}
 
       {/* 5. Importe */}
       <td className="truncate border px-4 py-2 text-center">
@@ -116,6 +122,34 @@ function BudgetItem({ presupuesto, onEliminar }) {
         >
           <Edit3 className="w-5 h-5 text-blue-500 dark:text-blue-400" />
         </button>
+        
+        {/* Descarga: siempre visible, pero deshabilitado si no hay archivo */}
+        <button
+          onClick={handleDownload}
+          disabled={!(archivo && archivo.url)}
+          className="
+            inline-block p-1 rounded 
+            hover:bg-gray-100 dark:hover:bg-gray-700 
+            disabled:opacity-50 disabled:cursor-not-allowed
+          "
+          title={
+            archivo && archivo.url
+              ? 'Ver/Descargar archivo'
+              : 'No hay archivo adjunto'
+          }
+        >
+          <DownloadCloud
+            className={`
+              w-5 h-5 
+              ${archivo && archivo.url
+                ? 'text-purple-500 dark:text-purple-400'
+                : 'text-gray-400'}
+            `}
+          />
+        </button>
+          
+        
+
         {/* Eliminar */}
         <button
           onClick={handleEliminar}

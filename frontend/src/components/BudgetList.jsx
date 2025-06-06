@@ -336,11 +336,10 @@ function BudgetList() {
                 <th className="border px-4 py-2 text-left">Titulo</th>
                 <th className="border px-4 py-2 text-left">Cliente</th>
                 <th className="border px-4 py-2 text-left">Descripción</th>
-                <th className="w-40 border px-4 py-2 text-center">Archivo</th>
                 <th className="w-40 border px-4 py-2 text-center">Importe (€)</th>
                 <th className="w-40 border px-4 py-2 text-center">Estado</th>
                 <th className="w-40 border px-4 py-2 text-center">F. de Creación</th>
-                <th className="w-40 border px-4 py-2 text-center">Acciones</th>
+                <th className="w-44 border px-4 py-2 text-center">Acciones</th>
               </tr>
             </thead>
             <tbody>
