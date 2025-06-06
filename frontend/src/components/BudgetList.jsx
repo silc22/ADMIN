@@ -220,7 +220,7 @@ function BudgetList() {
             <select
               value={estadoFilter}
               onChange={(e) => setEstadoFilter(e.target.value)}
-              className="w-full border px-2 py-1 rounded"
+              className="w-full border px-2 py-1 rounded "
             >
               <option value="">Todos</option>
               <option value="pendiente">Pendiente</option>
@@ -329,18 +329,18 @@ function BudgetList() {
       {/* 9.4) Tabla de Presupuestos */}
       {!cargando && presupuestos.length > 0 && (
         <div className="overflow-x-auto">
-          <table className="w-full table-auto border-collapse">
+          <table className="w-full table-fixed border-collapse">
             <thead>
               <tr className="bg-gray-200 text-gray-700">
-                <th className="border px-4 py-2 text-left">ID</th>
+                <th className="w-14 border px-4 py-2 text-left">ID</th>
                 <th className="border px-4 py-2 text-left">Titulo</th>
                 <th className="border px-4 py-2 text-left">Cliente</th>
                 <th className="border px-4 py-2 text-left">Descripción</th>
-                <th className="border px-4 py-2 text-center">Archivo</th>
-                <th className="border px-4 py-2 text-center">Importe (€)</th>
-                <th className="border px-4 py-2 text-center">Estado</th>
-                <th className="border px-4 py-2 text-center">F. de Creación</th>
-                <th className="border px-4 py-2 text-center">Acciones</th>
+                <th className="w-40 border px-4 py-2 text-center">Archivo</th>
+                <th className="w-40 border px-4 py-2 text-center">Importe (€)</th>
+                <th className="w-40 border px-4 py-2 text-center">Estado</th>
+                <th className="w-40 border px-4 py-2 text-center">F. de Creación</th>
+                <th className="w-40 border px-4 py-2 text-center">Acciones</th>
               </tr>
             </thead>
             <tbody>
@@ -386,7 +386,7 @@ function BudgetList() {
             Anterior
           </button>
 
-          <span className="text-gray-700">
+          <span className="text-gray-300">
             Página {currentPage} de {totalPages}
           </span>
 

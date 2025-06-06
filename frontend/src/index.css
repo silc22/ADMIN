@@ -4,8 +4,16 @@
 
 /* =====> Capa base para definir el bg por defecto <===== */
 @layer base {
+  input,
+  select {
+    @apply text-gray-800;
+  }
+  .dark input,
+  .dark select {
+    @apply text-gray-600;
+  }
   body {
     /* Fondo gris claro por defecto */
-    @apply bg-gray-100 dark:bg-gray-800 dark:text-white flex flex-col;
+    @apply bg-gray-100 dark:bg-gray-800 dark:text-white;
   }
 }

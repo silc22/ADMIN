@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { eliminarPresupuesto } from '../api/presupuestoApi';
+import { Eye, Edit3, Trash2 } from 'lucide-react';
 
 function BudgetItem({ presupuesto, onEliminar }) {
   const navigate = useNavigate();
@@ -41,26 +42,26 @@ function BudgetItem({ presupuesto, onEliminar }) {
   return (
     <tr className="hover:bg-gray-600 border">
       {/* 1. Número de Presupuesto */}
-      <td className="border px-4 py-2 ">
+      <td className="truncate border px-4 py-2 ">
         {identifier} 
       </td>
 
-      <td className="border px-4 py-2">
+      <td className="truncate border px-4 py-2">
         {titulo ? `${titulo}` : ''}
       </td>
 
       {/* 2. Cliente */}
-      <td className="border px-4 py-2">
+      <td className="truncate border px-4 py-2">
         {cliente}
       </td>
 
       {/* 3. Descripción */}
-      <td className="border px-4 py-2">
+      <td className="truncate border px-4 py-2">
         {textoCorto}
       </td>
 
       {/* 4. Archivo */}
-      <td className="border px-4 py-2 text-center">
+      <td className="truncate border px-4 py-2 text-center">
         {archivo && archivo.url ? (
           <a
             href={`${baseURL}${archivo.url}`}
@@ -76,15 +77,15 @@ function BudgetItem({ presupuesto, onEliminar }) {
       </td>
 
       {/* 5. Importe */}
-      <td className="border px-4 py-2 text-center">
+      <td className="truncate border px-4 py-2 text-center">
         {importe.toFixed(2)}
       </td>
 
       {/* 6. Estado */}
-      <td className="border  px-2 py-2 text-center">
+      <td className="truncate border px-2 py-2 text-center">
         <span
           className={`
-            px-1 py-1 rounded-md text-sm font-semibold flex flex-col
+            px-1 py-1 rounded text-sm font-semibold flex flex-col
             ${estado === 'pendiente' ? 'bg-yellow-200 text-yellow-800' : ''}
             ${estado === 'aprobado' ? 'bg-green-200 text-green-800' : ''}
             ${estado === 'rechazado' ? 'bg-red-200 text-red-800' : ''}
@@ -95,27 +96,33 @@ function BudgetItem({ presupuesto, onEliminar }) {
       </td>
 
       {/* 7. F. de Creación */}
-      <td className="border px-4 py-2 text-center">{fecha}</td>
+      <td className="truncate border px-4 py-2 text-center">{fecha}</td>
 
       {/* 8. Acciones (Editar / Eliminar) */}
       <td className="border px-4 py-2 text-center space-x-2">
+         {/* Detalle */}
+        <button
+          onClick={handleDetalle}
+          className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700"
+          title="Detalle"
+        >
+          <Eye className="w-5 h-5 text-green-500 dark:text-green-400" />
+        </button>
+        {/* Editar */}
         <button
           onClick={handleEditar}
-          className="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded text-sm"
+          className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700"
+          title="Editar"
         >
-          Editar
+          <Edit3 className="w-5 h-5 text-blue-500 dark:text-blue-400" />
         </button>
-        <button 
-          onClick={handleDetalle} 
-          className="px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600 text-sm"
-        >
-          Detalle
-        </button>
+        {/* Eliminar */}
         <button
           onClick={handleEliminar}
-          className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded text-sm"
+          className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700"
+          title="Eliminar"
         >
-          Eliminar
+          <Trash2 className="w-5 h-5 text-red-500 dark:text-red-400" />
         </button>
       </td>
     </tr>
