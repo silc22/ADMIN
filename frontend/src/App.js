@@ -10,6 +10,7 @@ import PrivateRoute from './components/PrivateRoute';
 import { AuthContext } from './context/AuthContext';
 import AdminRoute from './components/AdminRoute';
 import DetailBudgetPage from './pages/DetailBudgetPage';
+import { LogOut } from 'lucide-react';
 
 function App() {
   const { token,usuario, logout  } = useContext(AuthContext);
@@ -39,14 +40,14 @@ function App() {
                 Nuevo Presupuesto
               </Link>
 
-              <span className="">
+              <span className="pl-5">
                 {usuario?.nombre || usuario?.email}
               </span>
               <button
                 onClick={logout}
                 className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
               >
-                Cerrar sesión
+                 <LogOut />
               </button>
             </>
           ) : (
