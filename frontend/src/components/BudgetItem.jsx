@@ -52,6 +52,7 @@ function BudgetItem({ presupuesto, onEliminar }) {
         {identifier} 
       </td>
 
+      {/* TITULO*/}
       <td className="truncate border px-4 py-2">
         {titulo ? `${titulo}` : ''}
       </td>
