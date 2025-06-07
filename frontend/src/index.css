@@ -5,7 +5,8 @@
 /* =====> Capa base para definir el bg por defecto <===== */
 @layer base {
   input,
-  select {
+  select,
+  textarea {
     @apply text-gray-800;
   }
   .dark input,

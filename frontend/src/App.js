@@ -71,17 +71,19 @@ function App() {
         </div>
       </nav>
 
-      <div className="p-4">
+      <div className="pt-4">
         <Routes>
-          <Route path="/" element={<HomePage />} />
+          <Route 
+            path="/" 
+            element={<HomePage />} 
+          />
 
           <Route
             path="/presupuestos/nuevo"
             element={
               <PrivateRoute>
                 <NewBudgetPage />
-              </PrivateRoute>
-            }
+              </PrivateRoute>}
           />
           <Route
             path="/presupuestos/editar/:id"
@@ -108,7 +110,6 @@ function App() {
 
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
-
           <Route path="*" element={<HomePage />} />
         </Routes>
       </div>

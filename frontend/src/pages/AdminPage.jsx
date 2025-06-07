@@ -49,7 +49,7 @@ export default function AdminPage() {
   if (error) return <p className="text-red-600">{error}</p>;
 
   return (
-    <div className="max-w-3xl mx-auto p-4">
+    <div className="max-w-3xl mx-auto p-4 pt-16">
       <h2 className="text-2xl font-bold mb-4">Panel de Administrador</h2>
 
       {usuarios.length === 0 ? (
@@ -57,7 +57,7 @@ export default function AdminPage() {
       ) : (
         <table className="w-full table-auto border-collapse">
           <thead>
-            <tr className="bg-gray-200">
+            <tr className="dark:text-gray-600 bg-gray-200">
               <th className="border px-2 py-1">Email</th>
               <th className="border px-2 py-1">Nombre</th>
               <th className="border px-2 py-1">Rol</th>
@@ -66,10 +66,10 @@ export default function AdminPage() {
           </thead>
           <tbody>
             {usuarios.map((u) => (
-              <tr key={u._id} className="hover:bg-gray-100">
+              <tr key={u._id} className="hover:bg-gray-100 hover:text-gray-600 text-center">
                 <td className="border px-2 py-1">{u.email}</td>
-                <td className="border px-2 py-1">{u.nombre || '—'}</td>
-                <td className="border px-2 py-1">
+                <td className="border px-2 py-1 ">{u.nombre || '—'}</td>
+                <td className="border px-2 py-1 ">
                   <select
                     value={u.role}
                     onChange={(e) => handleChangeRole(u._id, e.target.value)}

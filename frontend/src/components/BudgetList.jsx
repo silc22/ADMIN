@@ -206,7 +206,7 @@ function BudgetList() {
       {/* 9.1) Formulario de filtros con botón “Aplicar Filtros” */}
       <form
         onSubmit={handleBuscar}
-        className="mb-6 space-y-4 p-4  mt-4"
+        className="mb-6 space-y-4 py-4 mt-4"
       >
         <h3 className="text-lg font-semibold mb-2">Filtros de Presupuestos</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -430,7 +430,7 @@ function BudgetList() {
             </button>
 
             <span >
-              Página {currentPage} de {totalPages}
+              {currentPage} de {totalPages}
             </span>
 
             <button

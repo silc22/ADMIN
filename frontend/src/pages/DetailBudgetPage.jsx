@@ -46,34 +46,39 @@ export default function DetailBudgetPage() {
   const fechaFormateada = new Date(presupuesto.fechaCreacion).toLocaleDateString('es-ES');
 
   return (
-    <div className="max-w-3xl mx-auto mt-6 p-6 bg-white rounded shadow">
-      <h2 className="text-2xl font-semibold mb-4">
+    <div className="rounded max-w-lg mx-auto p-4 mt-48 md:mt-20 border border-gray-600 dark:border-gray-100 ">
+      <h2 className="text-2xl font-semibold mb-4 text-center">
         Detalle de Presupuesto #{presupuesto.identifier}
       </h2>
 
-      <div className="space-y-3">
+      <div className="space-y-3 ">
         {/* Título (opcional) */}
         {presupuesto.titulo && (
-          <p>
+          <p className='border-b p-2'>
             <span className="font-medium">Título: </span>
             <span>{presupuesto.titulo}</span>
           </p>
         )}
 
-        <p>
+        <p className='border-b p-2'>
           <span className="font-medium">Cliente: </span>
           <span>{presupuesto.cliente}</span>
         </p>
 
         {presupuesto.descripcion && (
-          <p>
+          <div className="rounded max-h-50 p-2 break-words whitespace-normal dark:bg-gray-100 dark:text-black">
+
+          <p >
             <span className="font-medium">Descripción: </span>
-            <span>{presupuesto.descripcion}</span>
           </p>
+          <p>
+            <span > {presupuesto.descripcion}</span>
+          </p>
+          </div>
         )}
 
         <p>
-          <span className="font-medium">Importe: </span>
+          <span className="font-medium p-2">Importe: </span>
           <span>
             € {presupuesto.importe.toLocaleString('es-ES', {
               minimumFractionDigits: 2,
@@ -82,20 +87,20 @@ export default function DetailBudgetPage() {
           </span>
         </p>
 
-        <p>
+        <p className='p-2'>
           <span className="font-medium">Estado: </span>
           <span className="capitalize">{presupuesto.estado}</span>
         </p>
 
         <p>
-          <span className="font-medium">Fecha de creación: </span>
+          <span className="font-medium p-2">Fecha de creación: </span>
           <span>{fechaFormateada}</span>
         </p>
 
         {/* Si existe archivo adjunto, mostrar enlace de descarga */}
         {presupuesto.archivo && presupuesto.archivo.url && (
           <div>
-            <span className="font-medium">Archivo adjunto: </span>
+            <span className="font-medium p-2">Archivo adjunto: </span>
             <a
               href={`${baseURL}${presupuesto.archivo.url}`}
               target="_blank"
@@ -111,16 +116,16 @@ export default function DetailBudgetPage() {
       {/* Botones para volver o editar */}
       <div className="mt-6 flex gap-4">
         <Link
-          to="/presupuestos"
-          className="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300"
-        >
-          ← Volver
-        </Link>
-        <Link
           to={`/presupuestos/editar/${presupuesto._id}`}
           className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
         >
           Editar
+        </Link>
+        <Link
+          to="/presupuestos"
+          className="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300"
+        >
+          ← Volver
         </Link>
       </div>
     </div>

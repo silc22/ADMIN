@@ -214,7 +214,7 @@ exports.crearPresupuesto = async (req, res) => {
 
     // Construir nuevo objeto Presupuesto
     const nuevoPresupuesto = new Presupuesto({
-      owner: req.user.id, // <─ asignar owner
+      owner: req.user.id, 
       titulo: titulo || '',
       cliente,
       descripcion,
