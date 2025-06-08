@@ -2,12 +2,16 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { getPresupuestoPorId } from '../api/presupuestoApi';
+import axios from 'axios';
 
 export default function DetailBudgetPage() {
   const { id } = useParams();
   const [presupuesto, setPresupuesto] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [emailDest, setEmailDest] = useState('');
+  const [sending, setSending] = useState(false);
+
 
   // Base URL para descargas (ajusta según tu .env o la configuración real)
   const baseURL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
@@ -42,6 +46,23 @@ export default function DetailBudgetPage() {
     return <p className="p-4 text-gray-700">Presupuesto no encontrado.</p>;
   }
 
+  const handleSendEmail = async () => {
+    if (!emailDest.trim()) return alert('Introduce un email');
+    try {
+      setSending(true);
+      await axios.post(
+        `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/presupuestos/${id}/email`,
+        { to: emailDest },
+        { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+      );
+      alert('Email enviado ✅');
+    } catch (err) {
+      console.error(err);
+      alert('Error al enviar email');
+    } finally {
+      setSending(false);
+    }
+  };
   // Formatear fecha a dd/mm/yyyy
   const fechaFormateada = new Date(presupuesto.fechaCreacion).toLocaleDateString('es-ES');
 
@@ -127,6 +148,35 @@ export default function DetailBudgetPage() {
         >
           ← Volver
         </Link>
+        <button
+          onClick={() =>
+          window.open(
+            `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/presupuestos/${id}/pdf`,
+            '_blank'
+            )
+            }
+            className="px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600"
+          >
+            Descargar PDF
+        </button>
+      </div>
+      
+      {/* Form para enviar por email */}
+      <div className="mt-6 space-y-2">
+        <input
+          type="email"
+          placeholder="Email destinatario"
+          value={emailDest}
+          onChange={(e) => setEmailDest(e.target.value)}
+          className="w-full border px-3 py-2 rounded"
+        />
+        <button
+          onClick={handleSendEmail}
+          disabled={sending}
+          className="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600 disabled:opacity-50"
+        >
+          {sending ? 'Enviando…' : 'Enviar por Email'}
+        </button>
       </div>
     </div>
   );
