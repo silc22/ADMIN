@@ -71,7 +71,7 @@ function App() {
         </div>
       </nav>
 
-      <div className="pt-4">
+      <div className="p-4">
         <Routes>
           <Route 
             path="/" 
