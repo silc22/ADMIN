@@ -84,7 +84,7 @@ async function conectarMongo() {
 }
 
 // -------------- 3) `owner` fijo para todos ---------------
-const OWNER_ID = new mongoose.Types.ObjectId('6840c40b4fe8c91c1f1a9437');
+const OWNER_ID = new mongoose.Types.ObjectId('6846e3b1259032a893855fb1');
 
 // -------------- 4) Generar un presupuesto aleatorio ---------------
 function crearPresupuestoDeEjemplo(numero) {
