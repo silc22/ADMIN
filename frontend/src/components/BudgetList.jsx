@@ -1,9 +1,11 @@
 // src/components/BudgetList.jsx
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useContext } from 'react';
+import { AuthContext } from '../context/AuthContext';
 import { getPresupuestos, getResumenPresupuestos } from '../api/presupuestoApi';
 import BudgetItem from './BudgetItem';
 
 function BudgetList() {
+  const { token } = useContext(AuthContext);   
   // ---------------------------------------
   // 1) Estados de lista y filtros “en crudo”
   // ---------------------------------------
@@ -58,17 +60,19 @@ function BudgetList() {
       setPresupuestos(respuesta.data.data);
       setTotalPages(respuesta.data.pagination.totalPages);
     } catch (err) {
-      console.error(err);
-      setError('Error al cargar presupuestos');
+      console.error('Error al cargar presupuestos', err);
       setPresupuestos([]);
       setTotalPages(1);
+     // sólo mostramos el error si estamos autenticados y realmente falló
+     if (token) setError('Error al cargar presupuestos');
     } finally {
       setCargando(false);
     }
-  }, []);
+  }, [token]);
 
   const loadResumen = useCallback(async (params) => {
     try {
+      
       const res = await getResumenPresupuestos(params);
       setResumen(res.data.summary);
     } catch (err) {
@@ -87,10 +91,12 @@ function BudgetList() {
       page: currentPage,
       limit: itemsPerPage
     };
-    loadPresupuestos(paramsParaPage);
-    loadResumen(paramsParaPage);
+    if (token) {
+      loadPresupuestos(paramsParaPage);
+      loadResumen(paramsParaPage);    // lo mismo para el resumen
+    }
     // eslint-disable-next-line 
-  }, [currentPage, itemsPerPage, lastParams, loadPresupuestos, loadResumen]);
+  }, [token, currentPage, itemsPerPage, lastParams, loadPresupuestos, loadResumen]);
 
   // ---------------------------------------
   // 7) handleBuscar: al pulsar “Aplicar Filtros”
@@ -203,7 +209,7 @@ function BudgetList() {
   // ---------------------------------------
   return (
     <div className='mt-44 md:m-0'>
-      {/* 9.1) Formulario de filtros con botón “Aplicar Filtros” */}
+          {/* 9.1) Formulario de filtros con botón “Aplicar Filtros” */}
       <form
         onSubmit={handleBuscar}
         className="mb-6 space-y-4 py-4 mt-4"
@@ -368,7 +374,9 @@ function BudgetList() {
       {cargando && <p>Cargando datos…</p>}
       {error && <p className="text-red-600">{error}</p>}
 
+      
       {/* 9.4) Tabla de Presupuestos */}
+      
       {!cargando && presupuestos.length > 0 && (
         <div className="overflow-x-auto">
           <table className="min-w-full table-auto md:table-fixed border-collapse text-sm md:text-base">
@@ -406,9 +414,9 @@ function BudgetList() {
       )}
 
       {/* 9.5) Mensaje si lista vacía */}
-      {!cargando && presupuestos.length === 0 && (
+      {!token && presupuestos.length === 0 && (
         <p className="mt-4 text-gray-600">
-          No hay presupuestos que coincidan con los filtros.
+          Debes iniciar sesión para ver tus presupuestos.
         </p>
       )}
 

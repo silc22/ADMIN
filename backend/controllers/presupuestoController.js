@@ -2,6 +2,7 @@ const Presupuesto = require('../models/Presupuesto');
 const Counter = require('../models/Counter');
 const fs = require('fs');
 const path = require('path');
+const mongoose = require('mongoose');
 
 // Listar todos los presupuestos
 exports.obtenerPresupuestos = async (req, res) => {
@@ -24,7 +25,7 @@ exports.obtenerPresupuestos = async (req, res) => {
     limit = Number(limit);
 
     // 2) Construir un objeto "filtros" paso a paso
-    const filtros = {};
+     const filtros = { owner: req.user.id };
 
     // Filtrar por estado exacto
     if (estado) {
@@ -116,57 +117,27 @@ exports.obtenerPresupuestos = async (req, res) => {
 
 exports.getResumenPresupuestos = async (req, res) => {
   try {
-    // 1) Reconstruimos el mismo filtro que en obtenerPresupuestos:
+    const { id: userId } = req.user;
     const { q, estado, cliente, minImporte, maxImporte, fechaDesde, fechaHasta } = req.query;
-    let filtro = {};
-    if (q && q.trim() !== '') {
-      const texto = q.trim();
-      const regexp = new RegExp(texto, 'i');
-      filtro.$or = [{ titulo: regexp }, { descripcion: regexp }];
-    }
-    if (estado && ['pendiente', 'aprobado', 'rechazado'].includes(estado)) {
-      filtro.estado = estado;
-    }
-    if (cliente && cliente.trim() !== '') {
-        filtro.cliente = new RegExp(cliente.trim(), 'i');
-    }
-    if (minImporte !== undefined || maxImporte !== undefined) {
-      filtro.importe = {};
-      if (minImporte !== undefined && !isNaN(parseFloat(minImporte))) {
-        filtro.importe.$gte = parseFloat(minImporte);
-      }
-      if (maxImporte !== undefined && !isNaN(parseFloat(maxImporte))) {
-        filtro.importe.$lte = parseFloat(maxImporte);
-      }
-      if (Object.keys(filtro.importe).length === 0) delete filtro.importe;
-    }
-    if ((fechaDesde && !isNaN(new Date(fechaDesde))) || (fechaHasta && !isNaN(new Date(fechaHasta)))) {
-      filtro.fechaCreacion = {};
-    if (fechaDesde && !isNaN(new Date(fechaDesde))) {
-      filtro.fechaCreacion.$gte = new Date(fechaDesde);
-    }
-      if (fechaHasta && !isNaN(new Date(fechaHasta))) {
-        const hasta = new Date(fechaHasta);
-        hasta.setHours(23, 59, 59, 999);
-        filtro.fechaCreacion.$lte = hasta;
-      }
-      if (Object.keys(filtro.fechaCreacion).length === 0) delete filtro.fechaCreacion;
-    }
 
-    // 2) Usar agregación de Mongo para agrupar por estado:
+    // Filtro por owner (convierte a ObjectId)
+    const filtro = { owner: new mongoose.Types.ObjectId(userId) };
+    // … añade aquí tus condiciones sobre filtro (q, estado, etc.) …
+
+    // Pipeline corregido:
     const pipeline = [
       { $match: filtro },
       {
         $group: {
-          _id: '$estado',
-          count: { $sum: 1 },
-          totalImporte: { $sum: '$importe' }
+          _id: '$estado',             // agrupo por estado
+          count: { $sum: 1 },         // cuento documentos
+          totalImporte: { $sum: '$importe' } // sumo importe
         }
       },
       {
         $project: {
           _id: 0,
-          estado: '$_id',
+          estado: '$_id',             // saco el estado de _id
           count: 1,
           totalImporte: 1
         }
@@ -175,13 +146,11 @@ exports.getResumenPresupuestos = async (req, res) => {
 
     const resumen = await Presupuesto.aggregate(pipeline);
 
-    // 3) Asegurarnos de que todos los estados aparezcan (incluso con 0)
-    const estadosPosibles = ['pendiente', 'aprobado', 'rechazado'];
-    const resumenCompleto = estadosPosibles.map((e) => {
-      const encontrado = resumen.find((r) => r.estado === e);
-      return encontrado
-        ? encontrado
-        : { estado: e, count: 0, totalImporte: 0 };
+    // Completar con ceros estados faltantes
+    const estadosPosibles = ['pendiente','aprobado','rechazado'];
+    const resumenCompleto = estadosPosibles.map(e => {
+      const found = resumen.find(r => r.estado === e);
+      return found || { estado: e, count: 0, totalImporte: 0 };
     });
 
     return res.json({ summary: resumenCompleto });
@@ -194,11 +163,12 @@ exports.getResumenPresupuestos = async (req, res) => {
 // Obtener un presupuesto por id
 exports.obtenerPresupuestoPorId = async (req, res) => {
   try {
-    const { id } = req.params;
-    const presupuesto = await Presupuesto.findById(id);
+    // Sólo quien lo creó
+    const presupuesto = await Presupuesto.findOne({ _id: id, owner: req.user.id });
     if (!presupuesto) {
-      return res.status(404).json({ mensaje: 'Presupuesto no encontrado' });
-    }
+    return res.status(404).json({ mensaje: 'No encontrado o no autorizado' });
+  }
+    res.json(presupuesto);
     res.json(presupuesto);
   } catch (error) {
     console.error(error);

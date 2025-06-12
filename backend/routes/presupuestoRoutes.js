@@ -3,7 +3,6 @@ const path = require('path');
 const { body, param, validationResult } = require('express-validator');
 const router = express.Router();
 const authMiddleware = require('../middleware/authMiddleware');
-const requireAdmin = require('../middleware/roleMiddleware')('admin');
 const { generatePdfFromHtml } = require('../utils/pdfGenerator');
 const Presupuesto = require('../models/Presupuesto');
 
@@ -24,7 +23,7 @@ module.exports = (upload) => {
   router.get('/summary', authMiddleware, getResumenPresupuestos);
 
   // GET /api/presupuestos        ⇒ Listar todos (sin adjunto)
-  router.get('/', obtenerPresupuestos);
+  router.get('/', authMiddleware, obtenerPresupuestos);
 
   // GET /api/presupuestos/:id    ⇒ Obtener uno (incluyendo info de archivo)
   router.get(
@@ -35,7 +34,7 @@ module.exports = (upload) => {
       if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
       next();
     },
-    obtenerPresupuestoPorId
+    obtenerPresupuestoPorId, authMiddleware
   );
 
   // POST /api/presupuestos       ⇒ Crear nuevo (admite archivo único en “archivo”)
