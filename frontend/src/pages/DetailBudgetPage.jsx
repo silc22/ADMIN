@@ -1,7 +1,8 @@
 // src/pages/DetailBudgetPage.jsx
-import { useState, useEffect } from 'react';
+import { useState, useEffect,  } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { getPresupuestoPorId } from '../api/presupuestoApi';
+import { descargarPdfPresupuesto } from '../api/presupuestoApi';
 import axios from 'axios';
 
 export default function DetailBudgetPage() {
@@ -11,7 +12,6 @@ export default function DetailBudgetPage() {
   const [error, setError] = useState(null);
   const [emailDest, setEmailDest] = useState('');
   const [sending, setSending] = useState(false);
-
 
   // Base URL para descargas (ajusta según tu .env o la configuración real)
   const baseURL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
@@ -63,6 +63,27 @@ export default function DetailBudgetPage() {
       setSending(false);
     }
   };
+
+  const handleDescargarPdf = async () => {
+    try {
+      // Llamada al backend con el token en headers (axiosConfig ya lo pone si lo configuraste)
+      const response = await descargarPdfPresupuesto(id);
+
+      // Crea un blob y fuerza la descarga
+      const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `presupuesto_${presupuesto.identifier}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error(err);
+      alert('Error al descargar el PDF');
+    }
+  };
+
   // Formatear fecha a dd/mm/yyyy
   const fechaFormateada = new Date(presupuesto.fechaCreacion).toLocaleDateString('es-ES');
 
@@ -149,13 +170,8 @@ export default function DetailBudgetPage() {
           ← Volver
         </Link>
         <button
-          onClick={() =>
-          window.open(
-            `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/presupuestos/${id}/pdf`,
-            '_blank'
-            )
-            }
-            className="px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600"
+          onClick={handleDescargarPdf}
+          className="px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600"
           >
             Descargar PDF
         </button>

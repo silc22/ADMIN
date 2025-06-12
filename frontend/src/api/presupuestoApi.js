@@ -85,3 +85,9 @@ export const actualizarPresupuesto = (id, data, file) => {
 export const eliminarPresupuesto = (id) => {
   return apiClient.delete(`/presupuestos/${id}`);
 };
+
+export const descargarPdfPresupuesto = (id) => {
+  return apiClient.get(`/presupuestos/${id}/pdf`, {
+    responseType: 'blob'  // importante para recibir binario
+  });
+};
