@@ -5,7 +5,7 @@ import { getPresupuestos, getResumenPresupuestos } from '../api/presupuestoApi';
 import BudgetItem from './BudgetItem';
 
 function BudgetList() {
-  const { token } = useContext(AuthContext);   
+  const { token } = useContext(AuthContext); 
   // ---------------------------------------
   // 1) Estados de lista y filtros “en crudo”
   // ---------------------------------------
@@ -98,6 +98,17 @@ function BudgetList() {
     // eslint-disable-next-line 
   }, [token, currentPage, itemsPerPage, lastParams, loadPresupuestos, loadResumen]);
 
+
+  // Cuando token cambie y sea falsy, reseteamos todo
+  useEffect(() => {
+    if (!token) {
+      setPresupuestos([]);
+      setResumen([]);
+      setCurrentPage(1);
+      setTotalPages(1);
+      setError(null);
+    }
+  }, [token]);
   // ---------------------------------------
   // 7) handleBuscar: al pulsar “Aplicar Filtros”
   // ---------------------------------------

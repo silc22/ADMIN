@@ -120,25 +120,65 @@ exports.getResumenPresupuestos = async (req, res) => {
     const { id: userId } = req.user;
     const { q, estado, cliente, minImporte, maxImporte, fechaDesde, fechaHasta } = req.query;
 
-    // Filtro por owner (convierte a ObjectId)
+    // 1) Filtro base: sólo mis propios presupuestos
     const filtro = { owner: new mongoose.Types.ObjectId(userId) };
-    // … añade aquí tus condiciones sobre filtro (q, estado, etc.) …
 
-    // Pipeline corregido:
+    // 2) Filtros adicionales (idénticos a obtenerPresupuestos)
+    if (q && q.trim() !== '') {
+      const texto = q.trim();
+      const regexp = new RegExp(texto, 'i');
+      const qNum   = /^\d+$/.test(texto) ? parseInt(texto, 10) : null;
+      filtro.$or  = [
+        { titulo:      { $regex: regexp } },
+        { descripcion: { $regex: regexp } },
+        { cliente:     { $regex: regexp } }
+      ];
+      if (qNum !== null) filtro.$or.push({ identifier: qNum });
+    }
+
+    if (estado && ['pendiente','aprobado','rechazado'].includes(estado)) {
+      filtro.estado = estado;
+    }
+
+    if (cliente && cliente.trim() !== '') {
+      filtro.cliente = { $regex: cliente.trim(), $options: 'i' };
+    }
+
+    if (minImporte !== undefined || maxImporte !== undefined) {
+      filtro.importe = {};
+      if (!isNaN(parseFloat(minImporte))) filtro.importe.$gte = parseFloat(minImporte);
+      if (!isNaN(parseFloat(maxImporte))) filtro.importe.$lte = parseFloat(maxImporte);
+      if (Object.keys(filtro.importe).length === 0) delete filtro.importe;
+    }
+
+    if (fechaDesde || fechaHasta) {
+      filtro.fechaCreacion = {};
+      if (fechaDesde && !isNaN(new Date(fechaDesde))) {
+        filtro.fechaCreacion.$gte = new Date(fechaDesde);
+      }
+      if (fechaHasta && !isNaN(new Date(fechaHasta))) {
+        const hasta = new Date(fechaHasta);
+        hasta.setHours(23,59,59,999);
+        filtro.fechaCreacion.$lte = hasta;
+      }
+      if (Object.keys(filtro.fechaCreacion).length === 0) delete filtro.fechaCreacion;
+    }
+
+    // 3) Pipeline de agregación con todos los filtros aplicados
     const pipeline = [
       { $match: filtro },
       {
         $group: {
-          _id: '$estado',             // agrupo por estado
-          count: { $sum: 1 },         // cuento documentos
-          totalImporte: { $sum: '$importe' } // sumo importe
+          _id: '$estado',
+          count: { $sum: 1 },
+          totalImporte: { $sum: '$importe' }
         }
       },
       {
         $project: {
           _id: 0,
-          estado: '$_id',             // saco el estado de _id
-          count: 1,
+          estado:       '$_id',
+          count:        1,
           totalImporte: 1
         }
       }
@@ -146,11 +186,11 @@ exports.getResumenPresupuestos = async (req, res) => {
 
     const resumen = await Presupuesto.aggregate(pipeline);
 
-    // Completar con ceros estados faltantes
+    // 4) Completar estados faltantes
     const estadosPosibles = ['pendiente','aprobado','rechazado'];
     const resumenCompleto = estadosPosibles.map(e => {
-      const found = resumen.find(r => r.estado === e);
-      return found || { estado: e, count: 0, totalImporte: 0 };
+      const encontrado = resumen.find(r => r.estado === e);
+      return encontrado || { estado: e, count: 0, totalImporte: 0 };
     });
 
     return res.json({ summary: resumenCompleto });
