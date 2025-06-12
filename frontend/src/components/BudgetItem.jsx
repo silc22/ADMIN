@@ -6,6 +6,8 @@ function BudgetItem({ presupuesto, onEliminar }) {
   const navigate = useNavigate();
   const { _id, identifier, titulo, cliente, descripcion, importe, estado, fechaCreacion, archivo } = presupuesto;
   const fecha = new Date(fechaCreacion).toLocaleDateString('es-ES');
+  // Construir base de la URL (o usar env var)
+  const baseURL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
   // Navegar a página de detalle
   const handleDetalle = () => {
@@ -35,9 +37,6 @@ function BudgetItem({ presupuesto, onEliminar }) {
       alert('Hubo un error al eliminar el presupuesto');
     }
   };
-
-  // Construir base de la URL (o usar env var)
-  const baseURL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
   const textoCorto = descripcion
   ? (descripcion.length > 50
