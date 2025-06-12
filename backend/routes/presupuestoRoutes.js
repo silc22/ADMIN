@@ -21,7 +21,7 @@ module.exports = (upload) => {
   // 1) Nueva ruta: GET /api/presupuestos/summary
   //    Protegida o no, según necesites. Por ejemplo, si solo quieres mostrarla a admins, 
   //    agrega authMiddleware y requireAdmin. Si todos pueden verla, déjala pública.
-  router.get('/summary', authMiddleware, requireAdmin, getResumenPresupuestos);
+  router.get('/summary', authMiddleware, getResumenPresupuestos);
 
   // GET /api/presupuestos        ⇒ Listar todos (sin adjunto)
   router.get('/', obtenerPresupuestos);

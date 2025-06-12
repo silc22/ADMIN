@@ -1,6 +1,6 @@
 .env
 /uploads
-
+/scripts
 
 # dependencies
 /node_modules
